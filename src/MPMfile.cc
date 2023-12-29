@@ -14,10 +14,9 @@ size_t MPM_File::get_component_num()
     for (const auto& model : models) {
         components
             .insert(model->id);
-            // .second;
     }
     component_num = components.size();
-    return  components.size();
+    return components.size();
 }
 
 size_t MPM_File::get_particle_num()
@@ -39,13 +38,12 @@ size_t MPM_File::get_material_num()
             .insert(model
                         ->material
                         ->id);
-            // .second;
     }
     component_num = material_id.size();
     return component_num;
 }
 
-std::tuple<gp_Pnt&, gp_Pnt&> MPM_File::get_max_min_coor()
+std::tuple<gp_Pnt, gp_Pnt> MPM_File::get_max_min_coor()
 {
     gp_Pnt max_coor, min_coor;
     max_coor.SetX(std::numeric_limits<double>::min());
@@ -104,7 +102,7 @@ void MPM_File::write()
          << max.X() + up_extend.x << "\n";
     file << "spy " << min.Y() - down_extend.y << " "
          << max.Y() + up_extend.y << "\n";
-    file << "spx " << min.Z() - down_extend.z << " "
+    file << "spz " << min.Z() - down_extend.z << " "
          << max.Z() + up_extend.z << "\n";
     file << "dcell " << dx * dCell_scale << "\n";
 
@@ -126,19 +124,39 @@ void MPM_File::write()
          << detonation_point.z << "\n";
 
     // Material
+    std::unordered_set<int> id_set;
     file << "\n";
     file << "material\n";
     for (auto& model : models) {
-        file << model
-                    ->material
-                    ->to_string();
+        bool is_new = id_set
+                          .insert(model
+                                      ->material
+                                      ->id)
+                          .second;
+        if (is_new) {
+
+            file << model
+                        ->material
+                        ->to_string()
+                 << "\n";
+        }
     }
     //  EoS
+    id_set.clear();
     for (auto& model : models) {
-        file << model
-                    ->material
-                    ->eos
-                    ->to_string();
+        bool is_new = id_set
+                          .insert(model
+                                      ->material
+                                      ->eos
+                                      ->id)
+                          .second;
+        if (is_new) {
+            file << model
+                        ->material
+                        ->eos
+                        ->to_string()
+                 << "\n";
+        }
     }
 
     // PostProcess Parameter

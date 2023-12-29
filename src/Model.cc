@@ -103,20 +103,12 @@ void Model::fill_with_particle(double _dx, bool verbose)
 
     // Fill the model with particles
     size_t total_num = x_num * y_num * z_num;
-    double percent;
+    double percent = 0, elapsed = 0;
     Timer T;
     for (size_t i = 0; i < x_num; i++) {
         for (size_t j = 0; j < y_num; j++) {
             for (size_t k = 0; k < z_num; k++) {
                 if (verbose) {
-                    percent = (double)(i * y_num * z_num + j * z_num + k) / total_num;
-                    std::cout << "\r"
-                              << std::setprecision(2)
-                              << "Progress: " << percent * 100 << "%, "
-                              << std::setprecision(1)
-                              << "Elapsed: " << T.elapsed() << "s, "
-                              << "Estimated: " << T.elapsed() / (percent + std::numeric_limits<double>::min()) * (1 - percent) << "s, "
-                              << "Particle number: " << particles.size();
                 }
                 gp_Pnt point(
                     min_coor.X() + (i + 0.5) * dx,
@@ -126,13 +118,22 @@ void Model::fill_with_particle(double _dx, bool verbose)
                     particles.push_back(point);
                 }
                 if (verbose) {
+                    percent = (double)(i * y_num * z_num + j * z_num + k + 1) / total_num;
+                    elapsed = T.elapsed();
+                    std::cout << "\r"
+                              << std::setprecision(2)
+                              << "Progress: " << percent * 100 << "%, "
+                              << std::setprecision(1)
+                              << "Elapsed: " << elapsed << "s, "
+                              << "Estimated: " << elapsed / (percent + std::numeric_limits<double>::min()) * (1 - percent) << "s, "
+                              << "Particle number: " << particles.size();
                     std::cout.flush();
                 }
             }
         }
     }
     if (verbose) {
-        std::cout << "Total elapsed: " << T.elapsed() << "s" << std::endl;
+        std::cout << "\nTotal elapsed: " << T.elapsed() << "s" << std::endl;
         std::cout << std::setprecision(-1) << std::endl;
     }
 }
