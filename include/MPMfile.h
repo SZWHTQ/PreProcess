@@ -36,7 +36,7 @@ public:
     size_t particle_num = 0;
 
     enum class UNIT {
-        MMGS_MS,
+        MMGS_ms,
     } unit;
 
     enum class ALOGRITHM {
