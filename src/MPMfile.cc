@@ -89,7 +89,7 @@ void MPM_File::write()
     file.open(name + ".mpm", std::ios::out | std::ios::trunc);
     file << "mpm3d *** " << name << " ***\n";
     switch (unit) {
-    case UNIT::MMGS_MS:
+    case UNIT::MMGS_ms:
         file << "! Unit: mm g N ms MPa\n";
         break;
     default:
