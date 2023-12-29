@@ -78,6 +78,11 @@ std::tuple<gp_Pnt, gp_Pnt> MPM_File::get_max_min_coor()
     return std::tie(max_coor, min_coor);
 }
 
+void MPM_File::add(Model model)
+{
+    models.push_back(std::make_unique<Model>(model));
+}
+
 void MPM_File::write()
 {
     std::ofstream file;

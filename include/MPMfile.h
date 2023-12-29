@@ -20,9 +20,10 @@ struct Int_3D {
 };
 
 class MPM_File {
-public:
-    std::list<std::unique_ptr<Model>> models;
+private:
     std::string name;
+    std::list<std::unique_ptr<Model>> models;
+public:
 
     double dx;
     double dCell_scale = 1.8;
@@ -87,6 +88,7 @@ public:
     size_t get_particle_num();
     size_t get_material_num();
     std::tuple<gp_Pnt, gp_Pnt> get_max_min_coor();
+    void add(Model model);
     void write();
 };
 
