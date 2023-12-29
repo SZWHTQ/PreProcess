@@ -9,7 +9,7 @@ class Material;
 
 class Model {
 public:
-    size_t id;
+    size_t id; // component id
     std::string name;
     TopoDS_Shape shape;
 
