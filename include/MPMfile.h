@@ -62,8 +62,8 @@ public:
         SYMMETRY,
     };
 
-    Double_3D down_extend, up_extend;
     Int_3D down_boundary, up_boundary;
+    Double_3D down_extend, up_extend;
     Double_3D detonation_point;
 
     bool GIMP = true;
