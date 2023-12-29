@@ -103,13 +103,12 @@ void Model::fill_with_particle(double _dx, bool verbose)
 
     // Fill the model with particles
     size_t total_num = x_num * y_num * z_num;
-    double percent = 0, elapsed = 0;
-    Timer T;
+    size_t count = 0, interval = 1e2;
+    double percent = 0, elapsed = 0, iter_per_second = 0;
+    Timer T, t;
     for (size_t i = 0; i < x_num; i++) {
         for (size_t j = 0; j < y_num; j++) {
             for (size_t k = 0; k < z_num; k++) {
-                if (verbose) {
-                }
                 gp_Pnt point(
                     min_coor.X() + (i + 0.5) * dx,
                     min_coor.Y() + (j + 0.5) * dx,
@@ -118,14 +117,20 @@ void Model::fill_with_particle(double _dx, bool verbose)
                     particles.push_back(point);
                 }
                 if (verbose) {
-                    percent = (double)(i * y_num * z_num + j * z_num + k + 1) / total_num;
+                    count++;
+                    percent = (double)count / total_num;
                     elapsed = T.elapsed();
+                    if (count % interval == 0) {
+                        iter_per_second = interval / (t.elapsed() + std::numeric_limits<double>::min());
+                        t.reset();
+                    }
                     std::cout << "\r"
                               << std::setprecision(2)
                               << "Progress: " << percent * 100 << "%, "
                               << std::setprecision(1)
                               << "Elapsed: " << elapsed << "s, "
                               << "Estimated: " << elapsed / (percent + std::numeric_limits<double>::min()) * (1 - percent) << "s, "
+                              << iter_per_second << "it/s, "
                               << "Particle number: " << particles.size();
                     std::cout.flush();
                 }
