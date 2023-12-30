@@ -12,9 +12,10 @@ protected:
 public:
     size_t id;
     std::string name;
-    double density;
+    const double density;
+
     Equation_of_State* eos;
-    Material();
+
     Material(double _density);
     ~Material();
 

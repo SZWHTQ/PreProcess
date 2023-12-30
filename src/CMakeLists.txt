@@ -11,6 +11,7 @@ list(
     "${dir}/MieGruneisen.cc"
     "${dir}/Model.cc"
     "${dir}/MPMfile.cc"
+    "${dir}/ThreadPool.cc"
     "${dir}/Timer.cc"
 )
 

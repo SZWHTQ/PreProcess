@@ -9,7 +9,10 @@
             ],
             "defines": [],
             "cStandard": "c17",
-            "cppStandard": "c++17"
+            "cppStandard": "c++17",
+            "compilerArgs": [
+                "-DNDEBUG"
+            ]
         }
     ],
     "version": 4
