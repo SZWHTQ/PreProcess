@@ -21,7 +21,7 @@ public:
         , a(_a)
         , E0(_E0)
         , V0(_V0) {};
-    std::string to_string();
+    std::string to_string(size_t count);
 };
 
 #endif

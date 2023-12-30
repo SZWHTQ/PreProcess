@@ -12,6 +12,7 @@
 #include "TopAbs.hxx"
 #include "TopExp.hxx"
 
+#include "ANSI.h"
 #include "Material.h"
 #include "Model.h"
 #include "Timer.h"
@@ -138,7 +139,12 @@ void Model::fill_with_particle(double _dx, bool verbose)
         }
     }
     if (verbose) {
-        std::cout << "\nTotal elapsed: " << T.elapsed() << "s" << std::endl;
-        std::cout << std::setprecision(-1) << std::endl;
+        std::cout.flush();
+        std::cout << ANSI_GREEN;
+        std::cout << "\nTotal elapsed: " << T.elapsed() << "s, "
+                  << "Particle number: " << particles.size()
+                  << std::endl;
+        std::cout << std::setprecision(-1);
+        std::cout << ANSI_RESET << std::endl;
     }
 }

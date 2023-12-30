@@ -7,6 +7,7 @@ list(
     "${dir}/JohnsonCook.cc"
     "${dir}/JonesWilkinsLee.cc"
     "${dir}/Material.cc"
+    "${dir}/MaterialLibrary.cc"
     "${dir}/MieGruneisen.cc"
     "${dir}/Model.cc"
     "${dir}/MPMfile.cc"

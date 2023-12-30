@@ -11,22 +11,18 @@ protected:
 
 public:
     size_t id;
+    std::string name;
     double density;
     Equation_of_State* eos;
-    Material()
-        : id(++instanceCount) {};
-    Material(double _density)
-        : density(_density)
-        , id(++instanceCount) {};
-    ~Material()
-    {
-        --instanceCount;
-    };
+    Material();
+    Material(double _density);
+    ~Material();
+
     static size_t getInstanceCount()
     {
         return instanceCount;
     }
-    virtual std::string to_string() = 0;
+    virtual std::string to_string(size_t count) = 0;
 };
 
 #endif

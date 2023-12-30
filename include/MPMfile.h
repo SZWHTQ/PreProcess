@@ -39,11 +39,11 @@ public:
         MMGS_ms,
     } unit;
 
-    enum class ALOGRITHM {
+    enum class ALGORITHM {
         MUSL,
         USF,
         USL,
-    } alogrithm;
+    } algorithm;
 
     // enum class POST_PROCESS {
     //     PARAVIEW,
@@ -67,7 +67,7 @@ public:
     Double_3D detonation_point;
 
     bool GIMP = true;
-    bool Jaumann = false;
+    bool Jaumann = true;
 
     bool Contact = false;
     enum class CONTACT {

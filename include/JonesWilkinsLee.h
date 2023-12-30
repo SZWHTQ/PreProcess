@@ -17,7 +17,7 @@ public:
         , R1(_R1)
         , R2(_R2)
         , omega(_omega) {};
-    std::string to_string();
+    std::string to_string(size_t count);
 };
 
 #endif

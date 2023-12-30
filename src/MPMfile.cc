@@ -33,6 +33,7 @@ size_t MPM_File::get_particle_num()
 size_t MPM_File::get_material_num()
 {
     std::unordered_set<int> material_id;
+    size_t count = 0;
     for (const auto& model : models) {
         material_id
             .insert(model
@@ -130,6 +131,7 @@ void MPM_File::write()
 
     // Material
     std::unordered_set<int> id_set;
+    size_t count = 0;
     file << "\n";
     file << "material\n";
     for (auto& model : models) {
@@ -139,15 +141,15 @@ void MPM_File::write()
                                       ->id)
                           .second;
         if (is_new) {
-
             file << model
                         ->material
-                        ->to_string()
+                        ->to_string(++count)
                  << "\n";
         }
     }
     //  EoS
     id_set.clear();
+    count = 0;
     for (auto& model : models) {
         bool is_new = id_set
                           .insert(model
@@ -159,7 +161,7 @@ void MPM_File::write()
             file << model
                         ->material
                         ->eos
-                        ->to_string()
+                        ->to_string(++count)
                  << "\n";
         }
     }
@@ -188,14 +190,14 @@ void MPM_File::write()
     if (GIMP) {
         file << "gimp\n";
     }
-    switch (alogrithm) {
-    case ALOGRITHM::MUSL:
+    switch (algorithm) {
+    case ALGORITHM::MUSL:
         file << "musl on\n";
         break;
-    case ALOGRITHM::USF:
+    case ALGORITHM::USF:
         file << "usf on\n";
         break;
-    case ALOGRITHM::USL:
+    case ALGORITHM::USL:
         file << "usl on\n";
         break;
     default:
@@ -220,7 +222,7 @@ void MPM_File::write()
     }
 
     // Particle Data
-    size_t count = 0;
+    count = 0;
     for (auto& model : models) {
         file << "\n";
         file << "Particle "

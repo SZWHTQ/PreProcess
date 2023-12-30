@@ -19,7 +19,7 @@ public:
     {
         return instanceCount;
     }
-    virtual std::string to_string() = 0;
+    virtual std::string to_string(size_t count) = 0;
 };
 
 #endif
