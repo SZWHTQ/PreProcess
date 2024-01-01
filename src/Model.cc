@@ -274,8 +274,8 @@ void Model::fill_with_particle_omp(double _dx, bool verbose)
 
 void Model::fill_with_particle_parallel(double _dx, bool verbose)
 {
-    // std::cout << "Fatal error, please use `fill_with_particle`\n";
-    // return;
+    std::cout << "Fatal error, please use `fill_with_particle`\n";
+    return;
     Model::dx = _dx;
     auto [max_coor, min_coor] = get_max_min_coor();
 
@@ -339,7 +339,7 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
         for (size_t j = 0; j < y_num; j++) {
             for (size_t k = 0; k < z_num; k++) {
                 /* Fatal error */
-                thread_pool.enqueue(std::bind(thread_function, i, j, k));
+                // thread_pool.enqueue(std::bind(thread_function, i, j, k));
             }
         }
     }
