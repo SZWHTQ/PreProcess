@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "gp_Pnt.hxx"
-
 #include "Explosive.h"
 #include "JonesWilkinsLee.h"
 #include "MPMfile.h"
@@ -42,12 +40,12 @@ void gen_MDF()
 // Fill with particles
 #ifdef NDEBUG
     const bool verbose = true;
-    Separator.fill_with_particle(1, verbose);
-    Cover.fill_with_particle(1, verbose);
-    Connector.fill_with_particle(1.5, verbose);
-    Board.fill_with_particle(1.5, verbose);
-    Bolts.fill_with_particle(1, verbose);
-    Rdx.fill_with_particle(0.75, verbose);
+    Separator.fill_with_particle_parallel(1, verbose);
+    Cover.fill_with_particle_parallel(1, verbose);
+    Connector.fill_with_particle_parallel(1.5, verbose);
+    Board.fill_with_particle_parallel(1.5, verbose);
+    Bolts.fill_with_particle_parallel(1, verbose);
+    Rdx.fill_with_particle_parallel(0.5, verbose);
 #else
     Separator.fill_with_particle(2);
     Cover.fill_with_particle(2);
@@ -88,8 +86,7 @@ void gen_MDF()
         P.reserve(original_size * 5);
         for (size_t d = 1; d <= duplicate_num; ++d) {
             for (size_t i = 0; i < original_size; ++i) {
-                gp_Pnt new_point(P[i].X(), P[i].Y(), P[i].Z() - 40 * d);
-                P.push_back(new_point);
+                P.emplace_back(P[i].X(), P[i].Y(), P[i].Z() - 40 * d);
             }
         }
     }
@@ -137,12 +134,12 @@ void gen_PZG()
     Model Rdx(6, "RDX", "./Model/PZG/RDX_67.step", library.get["RDX"]);
 
     const bool verbose = true;
-    Separator.fill_with_particle(1, verbose);
-    Cover.fill_with_particle(1, verbose);
-    Connector.fill_with_particle(1.5, verbose);
-    Board.fill_with_particle(1.5, verbose);
-    Bolts.fill_with_particle(1, verbose);
-    Rdx.fill_with_particle(0.5, verbose);
+    Separator.fill_with_particle_parallel(1, verbose);
+    Cover.fill_with_particle_parallel(1, verbose);
+    Connector.fill_with_particle_parallel(1.5, verbose);
+    Board.fill_with_particle_parallel(1.5, verbose);
+    Bolts.fill_with_particle_parallel(1, verbose);
+    Rdx.fill_with_particle_parallel(0.5, verbose);
 
     // Another kind of RDX particle distribution
     /*
@@ -175,8 +172,7 @@ void gen_PZG()
         P.reserve(original_size * 5);
         for (size_t d = 1; d <= duplicate_num; ++d) {
             for (size_t i = 0; i < original_size; ++i) {
-                gp_Pnt new_point(P[i].X(), P[i].Y(), P[i].Z() - 40 * d);
-                P.push_back(new_point);
+                P.emplace_back(P[i].X(), P[i].Y(), P[i].Z() - 40 * d);
             }
         }
     }
@@ -215,11 +211,11 @@ int main()
 {
     std::cout << "***MDF***" << std::endl;
     gen_MDF();
-    std::cout << "Done!" << std::endl;
+    std::cout << "Done" << std::endl;
 
     std::cout << "\n\n";
 
     std::cout << "***PZG***" << std::endl;
     gen_PZG();
-    std::cout << "Done!" << std::endl;
+    std::cout << "Done" << std::endl;
 }

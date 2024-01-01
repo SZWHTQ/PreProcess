@@ -143,6 +143,7 @@ void Model::fill_with_particle(double _dx, bool verbose)
     size_t iter = 0, interval = 1e2;
     double percent = 0, elapsed = 0, iter_per_second = 0;
     Timer T, t;
+    particles.reserve(total_num);
     for (size_t i = 0; i < x_num; i++) {
         for (size_t j = 0; j < y_num; j++) {
             for (size_t k = 0; k < z_num; k++) {
@@ -151,7 +152,7 @@ void Model::fill_with_particle(double _dx, bool verbose)
                     min_coor.Y() + (j + 0.5) * dx,
                     min_coor.Z() + (k + 0.5) * dx);
                 if (contain(&point)) {
-                    particles.push_back(point);
+                    particles.emplace_back(point.X(), point.Y(), point.Z());
                 }
                 if (verbose) {
                     ++iter;
@@ -216,6 +217,7 @@ void Model::fill_with_particle_omp(double _dx, bool verbose)
     double percent = 0, elapsed = 0, iter_per_second = 0;
     Timer T, t;
     const double min_x = min_coor.X(), min_y = min_coor.Y(), min_z = min_coor.Z();
+    particles.reserve(total_num);
 #pragma omp parallel
     {
 #pragma omp for collapse(3)
@@ -230,7 +232,7 @@ void Model::fill_with_particle_omp(double _dx, bool verbose)
                     if (contain(&point)) {
 #pragma omp critical
                         {
-                            particles.push_back(point);
+                            particles.emplace_back(point.X(), point.Y(), point.Z());
                         }
                     }
 
@@ -272,8 +274,8 @@ void Model::fill_with_particle_omp(double _dx, bool verbose)
 
 void Model::fill_with_particle_parallel(double _dx, bool verbose)
 {
-    std::cout << "Fatal error, please use `fill_with_particle`\n";
-    return;
+    // std::cout << "Fatal error, please use `fill_with_particle`\n";
+    // return;
     Model::dx = _dx;
     auto [max_coor, min_coor] = get_max_min_coor();
 
@@ -299,6 +301,7 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
 
     ThreadPool thread_pool(std::thread::hardware_concurrency());
     const double min_x = min_coor.X(), min_y = min_coor.Y(), min_z = min_coor.Z();
+    particles.reserve(total_num);
 
     auto thread_function = [&](size_t i, size_t j, size_t k) {
         gp_Pnt point(
@@ -308,7 +311,7 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
 
         if (contain(&point)) {
             std::lock_guard<std::mutex> lock(particles_mutex);
-            particles.push_back(point);
+            particles.emplace_back(point.X(), point.Y(), point.Z());
         }
 
         if (verbose) {
@@ -336,7 +339,7 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
         for (size_t j = 0; j < y_num; j++) {
             for (size_t k = 0; k < z_num; k++) {
                 /* Fatal error */
-                // thread_pool.enqueue(std::bind(thread_function, i, j, k));
+                thread_pool.enqueue(std::bind(thread_function, i, j, k));
             }
         }
     }

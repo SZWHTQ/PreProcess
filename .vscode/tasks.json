@@ -10,7 +10,42 @@
             ],
             "group": "build",
             "problemMatcher": [],
-            "detail": "CMake template build task"
-        }
+            "detail": "CMake template build task",
+            "dependsOn": [
+                "CMake: configure"
+            ]
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: configure",
+            "command": "configure",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "CMake template configure task"
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: clean",
+            "command": "clean",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "CMake template clean task"
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: install",
+            "command": "install",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "CMake template install task"
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: test",
+            "command": "test",
+            "group": "test",
+            "problemMatcher": [],
+            "detail": "CMake template test task"
+        }        
     ]
 }

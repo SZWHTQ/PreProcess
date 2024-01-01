@@ -7,7 +7,7 @@ project(
 set(CMAKE_CXX_STANDARD 17)
 
 # Set OpenCASCADE directory (change this to the actual path on your system)
-set(CMAKE_PREFIX_PATH "/home/tengqing/Repository/OpenCASCADE/latest/lib/cmake/opencascade")
+set(CMAKE_PREFIX_PATH "~/Repository/OpenCASCADE/latest/lib/cmake/opencascade")
 
 # Find OpenCASCADE components
 find_package(OpenCASCADE REQUIRED)

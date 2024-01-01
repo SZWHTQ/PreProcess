@@ -5,14 +5,15 @@
             "includePath": [
                 "${default}",
                 "${workspaceFolder}/include",
-                "/home/tengqing/Repository/OpenCASCADE/latest/include/opencascade"
+                "~/Repository/OpenCASCADE/latest/include/opencascade"
             ],
             "defines": [],
             "cStandard": "c17",
             "cppStandard": "c++17",
             "compilerArgs": [
                 "-DNDEBUG"
-            ]
+            ],
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4
