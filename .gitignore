@@ -1,5 +1,7 @@
 Model
 build
 _build
+cmake-build-debug
+cmake-build-release
 *.mpm
 # MDF.cc

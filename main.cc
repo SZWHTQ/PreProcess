@@ -40,12 +40,12 @@ void gen_MDF()
 // Fill with particles
 #ifdef NDEBUG
     const bool verbose = true;
-    Separator.fill_with_particle_parallel(1, verbose);
-    Cover.fill_with_particle_parallel(1, verbose);
-    Connector.fill_with_particle_parallel(1.5, verbose);
-    Board.fill_with_particle_parallel(1.5, verbose);
-    Bolts.fill_with_particle_parallel(1, verbose);
-    Rdx.fill_with_particle_parallel(0.5, verbose);
+    Separator.fill_with_particle(1, verbose);
+    Cover.fill_with_particle(1, verbose);
+    Connector.fill_with_particle(1.5, verbose);
+    Board.fill_with_particle(1.5, verbose);
+    Bolts.fill_with_particle(1, verbose);
+    Rdx.fill_with_particle(0.5, verbose);
 #else
     Separator.fill_with_particle(2);
     Cover.fill_with_particle(2);
@@ -134,12 +134,12 @@ void gen_PZG()
     Model Rdx(6, "RDX", "./Model/PZG/RDX_67.step", library.get["RDX"]);
 
     const bool verbose = true;
-    Separator.fill_with_particle_parallel(1, verbose);
-    Cover.fill_with_particle_parallel(1, verbose);
-    Connector.fill_with_particle_parallel(1.5, verbose);
-    Board.fill_with_particle_parallel(1.5, verbose);
-    Bolts.fill_with_particle_parallel(1, verbose);
-    Rdx.fill_with_particle_parallel(0.5, verbose);
+    Separator.fill_with_particle(1, verbose);
+    Cover.fill_with_particle(1, verbose);
+    Connector.fill_with_particle(1.5, verbose);
+    Board.fill_with_particle(1.5, verbose);
+    Bolts.fill_with_particle(1, verbose);
+    Rdx.fill_with_particle(0.5, verbose);
 
     // Another kind of RDX particle distribution
     /*
