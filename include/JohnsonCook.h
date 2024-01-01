@@ -36,7 +36,7 @@ public:
         , D4(_D4)
         , D5(_D5)
         , failure_strain_factor(_failure_strain_factor) {};
-    std::string to_string(size_t count);
+    std::string to_string();
 };
 
 #endif

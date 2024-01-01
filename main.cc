@@ -13,21 +13,20 @@
 #include "MaterialLibrary.h"
 #include "Model.h"
 
-void MDF()
+void gen_MDF()
 {
-    std::cout << "***MDF***" << std::endl;
     auto& library = Material_Library::get_library();
 
-    // // User defined material
-    // Explosive RDX(1.67e-3, 7420);
-    // RDX.eos = new Jones_Wilkins_Less(RDX.id,
-    //     611.3e5,
-    //     10.65e5,
-    //     4.4,
-    //     1.2,
-    //     0.32,
-    //     6530);
-    // RDX.name = "RDX";
+    // User defined material
+    Explosive RDX(1.67e-3, 7420);
+    RDX.eos = new Jones_Wilkins_Less(RDX.id,
+        611.3e5,
+        10.65e5,
+        4.4,
+        1.2,
+        0.32,
+        6530);
+    RDX.name = "my_RDX";
 
     // Material
     //  Use Method 1, get from library
@@ -38,7 +37,7 @@ void MDF()
     //  Use Method 2, direct
     Model Bolts(5, "Bolts", "./Model/MDF/Bolts.STEP", &Material_Library::steel);
     //  Or user defined material
-    Model Rdx(6, "RDX", "./Model/MDF/RDX_48_COMSOL.STEP", library.get["RDX"]);
+    Model Rdx(6, "RDX", "./Model/MDF/RDX_48_COMSOL.STEP", &RDX);
 
 // Fill with particles
 #ifdef NDEBUG
@@ -109,6 +108,7 @@ void MDF()
 
     MDF.down_extend.x = 15;
     MDF.up_extend.x = 15;
+    MDF.down_extend.z = 40 * 4;
 
     MDF.down_boundary.z = (int)MPM_File::BOUNDARY::SYMMETRY;
     MDF.down_boundary.y = (int)MPM_File::BOUNDARY::FIX;
@@ -121,13 +121,10 @@ void MDF()
     MDF.contact_parameters.type = MPM_File::CONTACT::LAGRANGIAN;
 
     MDF.write();
-
-    std::cout << "Done!" << std::endl;
 }
 
-void PZG()
+void gen_PZG()
 {
-    std::cout << "***PZG***" << std::endl;
     auto& library = Material_Library::get_library();
 
     Model Separator(1, "Separator", "./Model/PZG/101FENLIBAN.STEP", library.get["2A14T6"]);
@@ -198,6 +195,7 @@ void PZG()
 
     PZG.down_extend.x = 15;
     PZG.up_extend.x = 15;
+    PZG.down_extend.z = 40 * 4;
 
     PZG.down_boundary.z = (int)MPM_File::BOUNDARY::SYMMETRY;
     PZG.down_boundary.y = (int)MPM_File::BOUNDARY::FIX;
@@ -211,13 +209,17 @@ void PZG()
     PZG.contact_parameters.type = MPM_File::CONTACT::LAGRANGIAN;
 
     PZG.write();
-
-    std::cout << "Done!" << std::endl;
 }
 
 int main()
 {
-    MDF();
+    std::cout << "***MDF***" << std::endl;
+    gen_MDF();
+    std::cout << "Done!" << std::endl;
+
     std::cout << "\n\n";
-    PZG();
+
+    std::cout << "***PZG***" << std::endl;
+    gen_PZG();
+    std::cout << "Done!" << std::endl;
 }

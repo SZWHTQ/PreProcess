@@ -1,7 +1,7 @@
 #include "JohnsonCook.h"
 
-std::string Johnson_Cook::to_string(size_t count) {
-    std::string str = std::to_string(count) + " jcst ";
+std::string Johnson_Cook::to_string() {
+    std::string str = std::to_string(local_index) + " jcst ";
     str += std::to_string(density) + " ";
     str += std::to_string(youngs_modulus) + " ";
     str += std::to_string(poissons_ratio) + " ";

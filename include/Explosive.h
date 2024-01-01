@@ -9,7 +9,7 @@ public:
     Explosive(double _density, double _detonation_speed)
         : Material(_density)
         , detonation_speed(_detonation_speed) {};
-    std::string to_string(size_t count);
+    std::string to_string();
 };
 
 #endif

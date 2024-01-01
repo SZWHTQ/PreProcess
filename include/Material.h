@@ -11,6 +11,7 @@ protected:
 
 public:
     size_t id;
+    size_t local_index;
     std::string name;
     const double density;
 
@@ -23,7 +24,7 @@ public:
     {
         return instanceCount;
     }
-    virtual std::string to_string(size_t count) = 0;
+    virtual std::string to_string() = 0;
 };
 
 #endif

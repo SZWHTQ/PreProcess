@@ -33,7 +33,6 @@ size_t MPM_File::get_particle_num()
 size_t MPM_File::get_material_num()
 {
     std::unordered_set<int> material_id;
-    size_t count = 0;
     for (const auto& model : models) {
         material_id
             .insert(model
@@ -99,7 +98,7 @@ void MPM_File::write()
     file << "nbco " << get_component_num() << "\n";
     file << "nbbo " << models.size() << "\n";
     file << "nbmp " << get_particle_num() << "\n";
-    file << "nmat " << Material::getInstanceCount() << "\n";
+    file << "nmat " << get_material_num() << "\n";
 
     // Grid Span & Cell Size
     file << "\n";
@@ -135,33 +134,28 @@ void MPM_File::write()
     file << "\n";
     file << "material\n";
     for (auto& model : models) {
+        auto& mat = model->material;
         bool is_new = id_set
-                          .insert(model
-                                      ->material
-                                      ->id)
+                          .insert(mat->id)
                           .second;
         if (is_new) {
-            file << model
-                        ->material
-                        ->to_string(++count)
+            ++count;
+            mat->local_index = count;
+            file << mat->to_string()
                  << "\n";
         }
     }
     //  EoS
     id_set.clear();
-    count = 0;
     for (auto& model : models) {
+        auto& eos = model->material->eos;
         bool is_new = id_set
-                          .insert(model
-                                      ->material
-                                      ->eos
-                                      ->id)
+                          .insert(eos->id)
                           .second;
         if (is_new) {
-            file << model
-                        ->material
-                        ->eos
-                        ->to_string(++count)
+            file << eos->to_string(model
+                                       ->material
+                                       ->local_index)
                  << "\n";
         }
     }
@@ -231,7 +225,7 @@ void MPM_File::write()
             file << ++count << " "
                  << model
                         ->material
-                        ->id
+                        ->local_index
                  << " "
                  << model
                         ->material
