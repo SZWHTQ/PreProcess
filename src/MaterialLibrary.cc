@@ -60,6 +60,8 @@ Johnson_Cook Material_Library::_2A14T4(
     -0.01256,
     1.1);
 
+Explosive Material_Library::RDX(1.67e-3, 7420);
+
 Material_Library Material_Library::library;
 
 Material_Library::Material_Library()
@@ -91,6 +93,16 @@ Material_Library::Material_Library()
         2.7720001);
     _2A14T4.name = "2A14T4";
     add(&_2A14T4);
+
+    RDX.eos = new Jones_Wilkins_Less(RDX.id,
+        611.3e5,
+        10.65e5,
+        4.4,
+        1.2,
+        0.32,
+        6530);
+    RDX.name = "RDX";
+    add(&RDX);
 }
 
 Material_Library& Material_Library::get_library()

@@ -22,6 +22,7 @@ public:
     static Johnson_Cook steel;
     static Johnson_Cook _2A14T6;
     static Johnson_Cook _2A14T4;
+    static Explosive RDX;
 
     // Add material to the library
     void add(Material* material);
