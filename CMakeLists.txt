@@ -11,7 +11,7 @@ set(CMAKE_PREFIX_PATH "~/Repository/OpenCASCADE/latest/lib/cmake/opencascade")
 
 # Find OpenCASCADE components
 find_package(OpenCASCADE REQUIRED)
-# find_package(OpenMP)
+find_package(OpenMP)
 
 # Add your source files
 set(srcs)
