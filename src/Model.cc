@@ -8,13 +8,14 @@
 #include <string>
 // #include <thread>
 #include <tuple>
+#include <utility>
 
-#include "BRepBuilderAPI_MakeVertex.hxx"
+// #include "BRepBuilderAPI_MakeVertex.hxx"
 #include "BRepClass3d_SolidClassifier.hxx"
 #include "BRep_Tool.hxx"
 #include "STEPControl_Reader.hxx"
 #include "StlAPI_Reader.hxx"
-#include "TopAbs.hxx"
+// #include "TopAbs.hxx"
 #include "TopExp.hxx"
 
 #include "ANSI.h"
@@ -25,9 +26,9 @@
 
 bool compare_file_extension(const std::string& filename, const std::string& extension)
 {
-#include <algorithm> // Add this line
+// #include <algorithm> // Add this line
 
-    size_t dotPosition = filename.find_last_of(".");
+    size_t dotPosition = filename.find_last_of('.');
 
     if (dotPosition != std::string::npos) {
         std::string fileExtension = filename.substr(dotPosition + 1);
@@ -43,10 +44,10 @@ bool compare_file_extension(const std::string& filename, const std::string& exte
     return false;
 }
 
-Model::Model(size_t _id, std::string _model_name, std::string _file_path, Material* _material)
+Model::Model(size_t _id, std::string _model_name, const std::string& _file_path, Material* _material)
 {
     id = _id;
-    name = _model_name;
+    name = std::move(_model_name);
     material = _material;
     if (compare_file_extension(_file_path, "stp") || compare_file_extension(_file_path, "step")) {
         STEPControl_Reader stepReader;
@@ -78,7 +79,7 @@ Model::Model(size_t _id, std::string _model_name, std::string _file_path, Materi
     }
 }
 
-std::tuple<gp_Pnt, gp_Pnt> Model::get_max_min_coor()
+std::tuple<gp_Pnt, gp_Pnt> Model::get_max_min_coor() const
 {
     gp_Pnt max_coor, min_coor;
     max_coor.SetX(-std::numeric_limits<double>::max());
@@ -105,7 +106,7 @@ std::tuple<gp_Pnt, gp_Pnt> Model::get_max_min_coor()
     return std::tie(max_coor, min_coor);
 }
 
-bool Model::contain(gp_Pnt* point)
+bool Model::contain(gp_Pnt* point) const
 {
     // Create a vertex from the test point
     // TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(testPoint);
@@ -125,9 +126,9 @@ void Model::fill_with_particle(double _dx, bool verbose)
     auto [max_coor, min_coor] = get_max_min_coor();
 
     // Calculate the number of particles in each direction
-    size_t x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
-    size_t y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
-    size_t z_num = (size_t)((max_coor.Z() - min_coor.Z()) / dx + 1.5);
+    auto x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
+    auto y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
+    auto z_num = (size_t)((max_coor.Z() - min_coor.Z()) / dx + 1.5);
 
     if (verbose) {
         std::cout << "Filling " << name << "..." << std::endl;
@@ -194,9 +195,9 @@ void Model::fill_with_particle_omp(double _dx, bool verbose)
     auto [max_coor, min_coor] = get_max_min_coor();
 
     // Calculate the number of particles in each direction
-    size_t x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
-    size_t y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
-    size_t z_num = (size_t)((max_coor.Z() - min_coor.Z()) / dx + 1.5);
+    auto x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
+    auto y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
+    auto z_num = (size_t)((max_coor.Z() - min_coor.Z()) / dx + 1.5);
 
     if (verbose) {
         {
@@ -279,9 +280,9 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
     Model::dx = _dx;
     auto [max_coor, min_coor] = get_max_min_coor();
 
-    size_t x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
-    size_t y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
-    size_t z_num = (size_t)((max_coor.Z() - min_coor.Z()) / dx + 1.5);
+    auto x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
+    auto y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
+    auto z_num = (size_t)((max_coor.Z() - min_coor.Z()) / dx + 1.5);
 
     std::mutex particles_mutex; // Mutex for synchronizing access to particles vector
 
