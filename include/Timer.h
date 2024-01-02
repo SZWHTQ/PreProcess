@@ -10,7 +10,7 @@ private:
 public:
     Timer() { reset(); };
     void reset();
-    double elapsed() const;
+    [[nodiscard]] double elapsed() const;
 };
 
 #endif

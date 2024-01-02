@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <tuple>
+#include <utility>
 
 #include "gp_Pnt.hxx"
 
@@ -25,7 +26,7 @@ private:
     std::list<std::unique_ptr<Model>> models;
 public:
 
-    double dx;
+    double dx=0;
     double dCell_scale = 1.8;
     double dt_scale = 0.1;
     double end_time = 0;
@@ -37,13 +38,13 @@ public:
 
     enum class UNIT {
         MMGS_ms,
-    } unit;
+    } unit = UNIT::MMGS_ms;
 
     enum class ALGORITHM {
         MUSL,
         USF,
         USL,
-    } algorithm;
+    } algorithm = ALGORITHM::MUSL;
 
     // enum class POST_PROCESS {
     //     PARAVIEW,
@@ -81,14 +82,14 @@ public:
     } contact_parameters;
 
     MPM_File() = default;
-    MPM_File(std::string _name = "test")
-        : name(_name) {};
+    explicit MPM_File(std::string _name = "test")
+        : name(std::move(_name)) {};
 
     size_t get_component_num();
     size_t get_particle_num();
     size_t get_material_num();
     std::tuple<gp_Pnt, gp_Pnt> get_max_min_coor();
-    void add(Model model);
+    void add(const Model& model);
     void write();
 };
 

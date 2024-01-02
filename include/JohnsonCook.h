@@ -12,31 +12,31 @@ public:
     const double reference_strain_rate;
     const double D1, D2, D3, D4, D5;
     const double failure_strain_factor;
-    Johnson_Cook(double _density, double _youngs_modulus, double _poissons_ratio,
-        double _A, double _B, double _n, double _C, double _m,
-        double _room_temperature, double _melting_temperature,
-        double _specific_heat_capacity, double _reference_strain_rate,
-        double _D1, double _D2, double _D3, double _D4, double _D5,
-        double _failure_strain_factor)
-        : Material(_density)
-        , youngs_modulus(_youngs_modulus)
-        , poissons_ratio(_poissons_ratio)
-        , A(_A)
-        , B(_B)
-        , n(_n)
-        , C(_C)
-        , m(_m)
-        , room_temperature(_room_temperature)
-        , melting_temperature(_melting_temperature)
-        , specific_heat_capacity(_specific_heat_capacity)
-        , reference_strain_rate(_reference_strain_rate)
-        , D1(_D1)
-        , D2(_D2)
-        , D3(_D3)
-        , D4(_D4)
-        , D5(_D5)
-        , failure_strain_factor(_failure_strain_factor) {};
-    std::string to_string();
+    Johnson_Cook(double density_, double youngs_modulus_, double poissons_ratio_,
+        double A_, double B_, double n_, double C_, double m_,
+        double room_temperature_, double melting_temperature_,
+        double specific_heat_capacity_, double reference_strain_rate_,
+        double D1_, double D2_, double D3_, double D4_, double D5_,
+        double failure_strain_factor_)
+        : Material(density_)
+        , youngs_modulus(youngs_modulus_)
+        , poissons_ratio(poissons_ratio_)
+        , A(A_)
+        , B(B_)
+        , n(n_)
+        , C(C_)
+        , m(m_)
+        , room_temperature(room_temperature_)
+        , melting_temperature(melting_temperature_)
+        , specific_heat_capacity(specific_heat_capacity_)
+        , reference_strain_rate(reference_strain_rate_)
+        , D1(D1_)
+        , D2(D2_)
+        , D3(D3_)
+        , D4(D4_)
+        , D5(D5_)
+        , failure_strain_factor(failure_strain_factor_) {};
+    std::string to_string() override;
 };
 
 #endif

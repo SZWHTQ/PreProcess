@@ -9,7 +9,7 @@ protected:
 
 public:
     size_t id;
-    Equation_of_State(size_t _id)
+    explicit Equation_of_State(size_t _id)
         : id(_id) {};
     ~Equation_of_State()
     {

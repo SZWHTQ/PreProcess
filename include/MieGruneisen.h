@@ -8,20 +8,20 @@ public:
     const size_t type = 4;
     const std::string name = "Mie-Gruneisen";
     const double C, S1, S2, S3, gamma, a, E0, V0;
-    Mie_Gruneisen(size_t _id, double _C,
-        double _S1, double _S2, double _S3,
-        double _gamma, double _a = 0,
-        double _E0 = 0, double _V0 = 0)
-        : Equation_of_State(_id)
-        , C(_C)
-        , S1(_S1)
-        , S2(_S2)
-        , S3(_S3)
-        , gamma(_gamma)
-        , a(_a)
-        , E0(_E0)
-        , V0(_V0) {};
-    std::string to_string(size_t count);
+    Mie_Gruneisen(size_t id_, double C_,
+        double S1_, double S2_, double S3_,
+        double gamma_, double a_ = 0,
+        double E0_ = 0, double V0_ = 0)
+        : Equation_of_State(id_)
+        , C(C_)
+        , S1(S1_)
+        , S2(S2_)
+        , S3(S3_)
+        , gamma(gamma_)
+        , a(a_)
+        , E0(E0_)
+        , V0(V0_) {};
+    std::string to_string(size_t count) override;
 };
 
 #endif

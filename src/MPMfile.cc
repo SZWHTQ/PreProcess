@@ -1,5 +1,5 @@
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <unordered_set>
 
 #include "gp_Pnt.hxx"
@@ -78,7 +78,7 @@ std::tuple<gp_Pnt, gp_Pnt> MPM_File::get_max_min_coor()
     return std::tie(max_coor, min_coor);
 }
 
-void MPM_File::add(Model model)
+void MPM_File::add(const Model& model)
 {
     models.push_back(std::make_unique<Model>(model));
 }

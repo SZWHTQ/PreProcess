@@ -8,16 +8,16 @@ public:
     const size_t type = 3;
     const std::string name = "Jones-Wilkins-Lee";
     const double A, B, C, R1, R2, omega;
-    Jones_Wilkins_Less(size_t _id, double _A, double _B, double _C,
-        double _R1, double _R2, double _omega)
-        : Equation_of_State(_id)
-        , A(_A)
-        , B(_B)
-        , C(_C)
-        , R1(_R1)
-        , R2(_R2)
-        , omega(_omega) {};
-    std::string to_string(size_t count);
+    Jones_Wilkins_Less(size_t id_, double A_, double B_, double C_,
+        double R1_, double R2_, double omega_)
+        : Equation_of_State(id_)
+        , A(A_)
+        , B(B_)
+        , C(C_)
+        , R1(R1_)
+        , R2(R2_)
+        , omega(omega_) {};
+    std::string to_string(size_t count) override;
 };
 
 #endif

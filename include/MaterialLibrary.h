@@ -25,14 +25,14 @@ public:
     static Explosive RDX;
 
     // Add material to the library
+    Material_Library(Material_Library const&) = delete;
+    void operator=(Material_Library const&) = delete;
     void add(Material* material);
     std::map<std::string, Material*> get;
     static Material_Library& get_library();
 
 private:
     Material_Library();
-    Material_Library(Material_Library const&) = delete;
-    void operator=(Material_Library const&) = delete;
 
     // Singleton
     static Material_Library library;

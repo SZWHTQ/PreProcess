@@ -1,8 +1,7 @@
 // Usage Example
 
 #include <iostream>
-#include <math.h>
-#include <string>
+#include <cmath>
 #include <vector>
 
 #include "Explosive.h"
@@ -59,10 +58,10 @@ void gen_MDF()
     double x = 1.8, y = 0, z = 400;
     double radius = 0.24;
     Rdx.dx = 0.25;
-    size_t num_r = (size_t)(radius / Rdx.dx + 0.5);
+    size_t num_r = std::lround(radius / Rdx.dx + 0.5);
     size_t num_theta = 1;
-    double theta = 2 * M_PI / num_theta, phase = M_PI / 2;
-    size_t num_z = (size_t)(40 / Rdx.dx + 0.5);
+    double theta = 2 * M_PI / (double)(num_theta), phase = M_PI / 2;
+    size_t num_z = std::lround(40 / Rdx.dx + 0.5);
     for (size_t k = 0; k < num_z; k++) {
         for (size_t i = 0; i < num_r; i++) {
             for (size_t j = 0; j < num_theta; j++) {
@@ -70,7 +69,7 @@ void gen_MDF()
                 double x_ = x + _r * cos(theta * j + phase);
                 double y_ = y + _r * sin(theta * j + phase);
                 double z_ = z - (k + 0.5) * Rdx.dx;
-                Rdx.particles.push_back(gp_Pnt(x_, y_, z_));
+                Rdx.particles.emplace_back(x_, y_, z_);
             }
         }
     }
@@ -138,12 +137,12 @@ void gen_PZG()
     Model Rdx(6, "RDX", "./Model/PZG/RDX_67.step", library.get["RDX"]);
 
     const bool verbose = true;
-    Separator.fill_with_particle_parallel(1, true);
-    Cover.fill_with_particle_parallel(1, true);
-    Connector.fill_with_particle_parallel(1.5, true);
-    Board.fill_with_particle_parallel(1.5, true);
-    Bolts.fill_with_particle_parallel(1, true);
-    Rdx.fill_with_particle_parallel(0.5, true);
+    Separator.fill_with_particle_parallel(1, verbose);
+    Cover.fill_with_particle_parallel(1, verbose);
+    Connector.fill_with_particle_parallel(1.5, verbose);
+    Board.fill_with_particle_parallel(1.5, verbose);
+    Bolts.fill_with_particle_parallel(1, verbose);
+    Rdx.fill_with_particle_parallel(0.5, verbose);
 
     // Another kind of RDX particle distribution
     /*

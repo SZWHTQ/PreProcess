@@ -6,10 +6,10 @@
 class Explosive : public Material {
 public:
     const double detonation_speed;
-    Explosive(double _density, double _detonation_speed)
-        : Material(_density)
-        , detonation_speed(_detonation_speed) {};
-    std::string to_string();
+    Explosive(double density_, double detonation_speed_)
+        : Material(density_)
+        , detonation_speed(detonation_speed_) {};
+    std::string to_string() override;
 };
 
 #endif

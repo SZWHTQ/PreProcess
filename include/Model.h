@@ -17,7 +17,7 @@ public:
     std::vector<gp_Pnt> particles;
     double dx=0;
 
-    Material* material;
+    Material* material = nullptr;
 
     Model(size_t _id, std::string _model_name)
         : id(_id)
@@ -32,7 +32,7 @@ public:
         particles.clear();
     };
 
-    std::tuple<gp_Pnt, gp_Pnt> get_max_min_coor() const;
+    [[nodiscard]] std::tuple<gp_Pnt, gp_Pnt> get_max_min_coor() const;
     bool contain(gp_Pnt* point) const;
     void fill_with_particle(double dx, bool verbose=true);
     void fill_with_particle_omp(double dx, bool verbose=true);

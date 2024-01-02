@@ -11,13 +11,13 @@ protected:
 
 public:
     size_t id;
-    size_t local_index;
+    size_t local_index=0;
     std::string name;
     const double density;
 
-    Equation_of_State* eos;
+    Equation_of_State* eos = nullptr;
 
-    Material(double _density);
+    explicit Material(double _density);
     ~Material();
 
     static size_t getInstanceCount()

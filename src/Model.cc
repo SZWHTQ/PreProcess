@@ -3,19 +3,15 @@
 #include <iostream>
 #include <limits>
 #include <memory>
-// #include <mutex>
 #include <omp.h>
 #include <string>
-// #include <thread>
 #include <tuple>
 #include <utility>
 
-// #include "BRepBuilderAPI_MakeVertex.hxx"
 #include "BRepClass3d_SolidClassifier.hxx"
 #include "BRep_Tool.hxx"
 #include "STEPControl_Reader.hxx"
 #include "StlAPI_Reader.hxx"
-// #include "TopAbs.hxx"
 #include "TopExp.hxx"
 
 #include "ANSI.h"
@@ -142,7 +138,7 @@ void Model::fill_with_particle(double _dx, bool verbose)
     // Fill the model with particles
     size_t total_num = x_num * y_num * z_num;
     size_t iter = 0, interval = 1e2;
-    double percent = 0, elapsed = 0, iter_per_second = 0;
+    double percent, elapsed, iter_per_second = 0;
     Timer T, t;
     particles.reserve(total_num);
     for (size_t i = 0; i < x_num; i++) {
@@ -256,7 +252,7 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
         for (size_t i = 0; i < x_num; ++i) {
             for (size_t j = 0; j < y_num; ++j) {
                 for (size_t k = 0; k < z_num; ++k) {
-                    thread_pool.enqueue(std::bind(thread_function, i, j, k));
+                    thread_pool.enqueue([thread_function, i, j, k] { return thread_function(i, j, k); });
                 }
             }
         }
