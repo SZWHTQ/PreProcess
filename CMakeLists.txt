@@ -40,5 +40,5 @@ else()
 endif()
 
 
-add_executable("main" "main.cc")
+add_executable("main" "src/main.cc")
 target_link_libraries("main" ${PROJECT_NAME})
