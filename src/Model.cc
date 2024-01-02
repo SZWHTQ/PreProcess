@@ -187,6 +187,7 @@ void Model::fill_with_particle(double _dx, bool verbose)
         std::cout << ANSI_RESET_COLOR << std::endl;
     }
 }
+
 void Model::fill_with_particle_parallel(double _dx, bool verbose)
 {
     Model::dx = _dx;
@@ -214,8 +215,10 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
         size_t count = 0;
         const double min_x = min_coor.X(), min_y = min_coor.Y(), min_z = min_coor.Z();
         double percent = 0, elapsed = 0, iter_per_second = 0;
+
         ThreadPool thread_pool(std::thread::hardware_concurrency());
         Timer t;
+
         particles.reserve(total_num);
 
         auto thread_function = [&](size_t i, size_t j, size_t k) {
