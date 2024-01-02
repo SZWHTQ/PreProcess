@@ -1,19 +1,65 @@
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
-
-#include <thread>
-#include <mutex>
 #include <condition_variable>
-#include <queue>
 #include <functional>
+#include <mutex>
+#include <queue>
+#include <thread>
+#include <vector>
 
 class ThreadPool {
 public:
-    ThreadPool(size_t num_threads);
-    ~ThreadPool();
+    ThreadPool(size_t num_threads)
+        : stop(false)
+    {
+        for (size_t i = 0; i < num_threads; ++i) {
+            workers.emplace_back([this] {
+                while (true) {
+                    std::function<void()> task;
 
-    template<class F>
-    void enqueue(F&& task);
+                    {
+                        std::unique_lock<std::mutex> lock(queue_mutex);
+                        condition.wait(lock, [this] { return stop || !tasks.empty(); });
+
+                        if (stop && tasks.empty()) {
+                            return;
+                        }
+
+                        task = std::move(tasks.front());
+                        tasks.pop();
+                    }
+
+                    task();
+                }
+            });
+        }
+    }
+
+    ~ThreadPool()
+    {
+        {
+            std::unique_lock<std::mutex> lock(queue_mutex);
+            stop = true;
+        }
+
+        condition.notify_all();
+
+        for (std::thread& worker : workers) {
+            worker.join();
+        }
+    }
+
+    template <class F>
+    void enqueue(F&& task)
+    {
+        {
+            std::unique_lock<std::mutex> lock(queue_mutex);
+            tasks.emplace(std::forward<F>(task));
+        }
+
+        condition.notify_one();
+    }
+    bool stop;
 
 private:
     std::vector<std::thread> workers;
@@ -21,7 +67,6 @@ private:
 
     std::mutex queue_mutex;
     std::condition_variable condition;
-    bool stop;
 };
 
 #endif

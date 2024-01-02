@@ -40,12 +40,12 @@ void gen_MDF()
 // Fill with particles
 #ifdef NDEBUG
     const bool verbose = true;
-    Separator.fill_with_particle(1, verbose);
-    Cover.fill_with_particle(1, verbose);
-    Connector.fill_with_particle(1.5, verbose);
-    Board.fill_with_particle(1.5, verbose);
-    Bolts.fill_with_particle(1, verbose);
-    Rdx.fill_with_particle(0.5, verbose);
+    Separator.fill_with_particle_parallel(1, verbose);
+    Cover.fill_with_particle_parallel(1, verbose);
+    Connector.fill_with_particle_parallel(1.5, verbose);
+    Board.fill_with_particle_parallel(1.5, verbose);
+    Bolts.fill_with_particle_parallel(1, verbose);
+    // Rdx.fill_with_particle_parallel(0.65, verbose);
 #else
     Separator.fill_with_particle(2);
     Cover.fill_with_particle(2);
@@ -56,28 +56,30 @@ void gen_MDF()
 #endif
 
     // Another kind of RDX particle distribution
-    /*
-        double x = 1.8, y = 0, z = 400;
-        double radius = 0.48;
-        Rdx.dx = 0.1;
-        size_t num_r = (size_t)(radius / Rdx.dx + 0.5);
-        size_t num_theta = 8;
-        double theta = 2 * M_PI / num_theta;
-        size_t num_z = (size_t)(40 / Rdx.dx + 0.5);
-        for (size_t k = 0; k < num_z; k++) {
-            for (size_t i = 0; i < num_r; i++) {
-                for (size_t j = 0; j < num_theta; j++) {
-                    double _r = radius * (i + 0.5) / num_r;
-                    double x_ = x + _r * cos(theta * j);
-                    double y_ = y + _r * sin(theta * j);
-                    double z_ = z - (k + 0.5) * Rdx.dx;
-                    Rdx.particles.push_back(gp_Pnt(x_, y_, z_));
-                }
+    double x = 1.8, y = 0, z = 400;
+    double radius = 0.24;
+    Rdx.dx = 0.25;
+    size_t num_r = (size_t)(radius / Rdx.dx + 0.5);
+    size_t num_theta = 1;
+    double theta = 2 * M_PI / num_theta, phase = M_PI / 2;
+    size_t num_z = (size_t)(40 / Rdx.dx + 0.5);
+    for (size_t k = 0; k < num_z; k++) {
+        for (size_t i = 0; i < num_r; i++) {
+            for (size_t j = 0; j < num_theta; j++) {
+                double _r = radius * (i + 0.5) / num_r;
+                double x_ = x + _r * cos(theta * j + phase);
+                double y_ = y + _r * sin(theta * j + phase);
+                double z_ = z - (k + 0.5) * Rdx.dx;
+                Rdx.particles.push_back(gp_Pnt(x_, y_, z_));
             }
         }
-    */
+    }
 
     auto model_list = { &Separator, &Cover, &Connector, &Board, &Bolts, &Rdx };
+
+    // for (auto& model : model_list) {
+    //     std::cout << model->name << ": " << model->particles.size() << std::endl;
+    // }
 
     for (auto&& model : model_list) {
         auto& P = model->particles;
@@ -98,18 +100,20 @@ void gen_MDF()
     }
 
     MDF.dx = 0.75;
-    MDF.dCell_scale = 2;
+    MDF.dCell_scale = 1.8;
     MDF.end_time = 0.05;
     MDF.out_time = 5e-4;
     MDF.rpt_time = 1.25e-4;
 
     MDF.down_extend.x = 15;
     MDF.up_extend.x = 15;
-    MDF.down_extend.z = 40 * 4;
+    MDF.down_extend.z = 40 * 4 + 0.5 * MDF.dx;
+    MDF.up_extend.z = 0.5 * MDF.dx;
 
-    MDF.down_boundary.z = (int)MPM_File::BOUNDARY::SYMMETRY;
-    MDF.down_boundary.y = (int)MPM_File::BOUNDARY::FIX;
-    MDF.up_boundary.y = (int)MPM_File::BOUNDARY::SYMMETRY;
+    typedef MPM_File::BOUNDARY bound;
+    MDF.down_boundary.z = (int)bound::SYMMETRY;
+    MDF.down_boundary.y = (int)bound::FIX;
+    MDF.up_boundary.y = (int)bound::SYMMETRY;
 
     MDF.detonation_point.x = 1.8;
     MDF.detonation_point.z = 400;
@@ -134,12 +138,12 @@ void gen_PZG()
     Model Rdx(6, "RDX", "./Model/PZG/RDX_67.step", library.get["RDX"]);
 
     const bool verbose = true;
-    Separator.fill_with_particle(1, verbose);
-    Cover.fill_with_particle(1, verbose);
-    Connector.fill_with_particle(1.5, verbose);
-    Board.fill_with_particle(1.5, verbose);
-    Bolts.fill_with_particle(1, verbose);
-    Rdx.fill_with_particle(0.5, verbose);
+    Separator.fill_with_particle_parallel(1, true);
+    Cover.fill_with_particle_parallel(1, true);
+    Connector.fill_with_particle_parallel(1.5, true);
+    Board.fill_with_particle_parallel(1.5, true);
+    Bolts.fill_with_particle_parallel(1, true);
+    Rdx.fill_with_particle_parallel(0.5, true);
 
     // Another kind of RDX particle distribution
     /*
@@ -164,6 +168,10 @@ void gen_PZG()
     */
 
     auto model_list = { &Separator, &Cover, &Connector, &Board, &Bolts, &Rdx };
+
+    // for (auto& model : model_list) {
+    //     std::cout << model->name << ": " << model->particles.size() << std::endl;
+    // }
 
     for (auto&& model : model_list) {
         auto& P = model->particles;
@@ -191,7 +199,8 @@ void gen_PZG()
 
     PZG.down_extend.x = 15;
     PZG.up_extend.x = 15;
-    PZG.down_extend.z = 40 * 4;
+    PZG.down_extend.z = 40 * 4 + 0.5 * PZG.dx;
+    PZG.up_extend.z = 0.5 * PZG.dx;
 
     PZG.down_boundary.z = (int)MPM_File::BOUNDARY::SYMMETRY;
     PZG.down_boundary.y = (int)MPM_File::BOUNDARY::FIX;

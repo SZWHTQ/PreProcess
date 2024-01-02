@@ -26,7 +26,7 @@
 
 bool compare_file_extension(const std::string& filename, const std::string& extension)
 {
-// #include <algorithm> // Add this line
+    // #include <algorithm> // Add this line
 
     size_t dotPosition = filename.find_last_of('.');
 
@@ -184,7 +184,89 @@ void Model::fill_with_particle(double _dx, bool verbose)
                   << "Particle number: " << particles.size()
                   << std::endl;
         std::cout << std::setprecision(-1);
-        std::cout << ANSI_RESET << std::endl;
+        std::cout << ANSI_RESET_COLOR << std::endl;
+    }
+}
+void Model::fill_with_particle_parallel(double _dx, bool verbose)
+{
+    Model::dx = _dx;
+    auto [max_coor, min_coor] = get_max_min_coor();
+
+    auto x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
+    auto y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
+    auto z_num = (size_t)((max_coor.Z() - min_coor.Z()) / dx + 1.5);
+
+    std::mutex particles_mutex; // Mutex for synchronizing access to particles vector
+
+    if (verbose) {
+        std::cout << "Filling " << name << "..." << std::endl;
+        std::cout << "Max coordinate: " << max_coor.X() << ", " << max_coor.Y() << ", " << max_coor.Z() << std::endl;
+        std::cout << "Min coordinate: " << min_coor.X() << ", " << min_coor.Y() << ", " << min_coor.Z() << std::endl;
+        std::cout << "Total number: " << x_num * y_num * z_num << std::endl;
+        std::cout << "Number in each direction: " << x_num << ", " << y_num << ", " << z_num << std::endl;
+        std::cout << std::fixed;
+    }
+
+    Timer T;
+    {
+        const size_t total_num = x_num * y_num * z_num;
+        const size_t interval = 1e2;
+        size_t count = 0;
+        const double min_x = min_coor.X(), min_y = min_coor.Y(), min_z = min_coor.Z();
+        double percent = 0, elapsed = 0, iter_per_second = 0;
+        ThreadPool thread_pool(std::thread::hardware_concurrency());
+        Timer t;
+        particles.reserve(total_num);
+
+        auto thread_function = [&](size_t i, size_t j, size_t k) {
+            gp_Pnt point(
+                min_x + (i + 0.5) * dx,
+                min_y + (j + 0.5) * dx,
+                min_z + (k + 0.5) * dx);
+
+            if (contain(&point)) {
+                std::lock_guard<std::mutex> lock(particles_mutex);
+                particles.emplace_back(point.X(), point.Y(), point.Z());
+            }
+
+            if (verbose) {
+                std::lock_guard<std::mutex> lock(particles_mutex);
+                count++;
+                percent = (double)count / total_num;
+                elapsed = T.elapsed();
+                if (count % interval == 0) {
+                    iter_per_second = interval / (t.elapsed() + std::numeric_limits<double>::min());
+                    t.reset();
+                }
+                std::cout << "\r"
+                          << std::setprecision(2)
+                          << "Progress: " << percent * 100 << "%, "
+                          << std::setprecision(1)
+                          << "Elapsed: " << elapsed << "s, "
+                          << "Estimated: " << elapsed / (percent + std::numeric_limits<double>::min()) * (1 - percent) << "s, "
+                          << iter_per_second << "it/s, "
+                          << "Particle number: " << particles.size();
+                std::cout.flush();
+            }
+        };
+
+        for (size_t i = 0; i < x_num; ++i) {
+            for (size_t j = 0; j < y_num; ++j) {
+                for (size_t k = 0; k < z_num; ++k) {
+                    thread_pool.enqueue(std::bind(thread_function, i, j, k));
+                }
+            }
+        }
+    }
+
+    if (verbose) {
+        std::cout.flush();
+        std::cout << ANSI_GREEN;
+        std::cout << "\nTotal elapsed: " << T.elapsed() << "s, "
+                  << "Particle number: " << particles.size()
+                  << std::endl;
+        std::cout << std::setprecision(-1);
+        std::cout << ANSI_RESET_COLOR << std::endl;
     }
 }
 
@@ -269,93 +351,6 @@ void Model::fill_with_particle_omp(double _dx, bool verbose)
                   << "Particle number: " << particles.size()
                   << std::endl;
         std::cout << std::setprecision(-1);
-        std::cout << ANSI_RESET << std::endl;
-    }
-}
-
-void Model::fill_with_particle_parallel(double _dx, bool verbose)
-{
-    std::cout << "Fatal error, please use `fill_with_particle`\n";
-    return;
-    Model::dx = _dx;
-    auto [max_coor, min_coor] = get_max_min_coor();
-
-    auto x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
-    auto y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
-    auto z_num = (size_t)((max_coor.Z() - min_coor.Z()) / dx + 1.5);
-
-    std::mutex particles_mutex; // Mutex for synchronizing access to particles vector
-
-    if (verbose) {
-        std::cout << "Filling " << name << "..." << std::endl;
-        std::cout << "Max coordinate: " << max_coor.X() << ", " << max_coor.Y() << ", " << max_coor.Z() << std::endl;
-        std::cout << "Min coordinate: " << min_coor.X() << ", " << min_coor.Y() << ", " << min_coor.Z() << std::endl;
-        std::cout << "Total number: " << x_num * y_num * z_num << std::endl;
-        std::cout << "Number in each direction: " << x_num << ", " << y_num << ", " << z_num << std::endl;
-        std::cout << std::fixed;
-    }
-
-    size_t total_num = x_num * y_num * z_num;
-    size_t count = 0, interval = 1e2;
-    double percent = 0, elapsed = 0, iter_per_second = 0;
-    Timer T, t;
-
-    ThreadPool thread_pool(std::thread::hardware_concurrency());
-    const double min_x = min_coor.X(), min_y = min_coor.Y(), min_z = min_coor.Z();
-    particles.reserve(total_num);
-
-    auto thread_function = [&](size_t i, size_t j, size_t k) {
-        gp_Pnt point(
-            min_x + (i + 0.5) * dx,
-            min_y + (j + 0.5) * dx,
-            min_z + (k + 0.5) * dx);
-
-        if (contain(&point)) {
-            std::lock_guard<std::mutex> lock(particles_mutex);
-            particles.emplace_back(point.X(), point.Y(), point.Z());
-        }
-
-        if (verbose) {
-            std::lock_guard<std::mutex> lock(particles_mutex);
-            count++;
-            percent = (double)count / total_num;
-            elapsed = T.elapsed();
-            if (count % interval == 0) {
-                iter_per_second = interval / (t.elapsed() + std::numeric_limits<double>::min());
-                t.reset();
-            }
-            std::cout << "\r"
-                      << std::setprecision(2)
-                      << "Progress: " << percent * 100 << "%, "
-                      << std::setprecision(1)
-                      << "Elapsed: " << elapsed << "s, "
-                      << "Estimated: " << elapsed / (percent + std::numeric_limits<double>::min()) * (1 - percent) << "s, "
-                      << iter_per_second << "it/s, "
-                      << "Particle number: " << particles.size();
-            std::cout.flush();
-        }
-    };
-
-    for (size_t i = 0; i < x_num; i++) {
-        for (size_t j = 0; j < y_num; j++) {
-            for (size_t k = 0; k < z_num; k++) {
-                /* Fatal error */
-                // thread_pool.enqueue(std::bind(thread_function, i, j, k));
-            }
-        }
-    }
-
-    // Wait for all tasks to complete
-    // Note: This assumes the tasks are not dependent on each other
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
-    if (verbose) {
-        std::cout.flush();
-        std::cout << ANSI_GREEN;
-        std::cout << "\nTotal elapsed: " << T.elapsed() << "s, "
-                  << "Particle number: " << particles.size()
-                  << std::endl;
-        std::cout << std::setprecision(-1);
-        std::cout << ANSI_RESET << std::endl;
+        std::cout << ANSI_RESET_COLOR << std::endl;
     }
 }
