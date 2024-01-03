@@ -7,7 +7,11 @@ project(
 set(CMAKE_CXX_STANDARD 17)
 
 # Set OpenCASCADE directory (change this to the actual path on your system)
-set(CMAKE_PREFIX_PATH "~/Repository/OpenCASCADE/latest/lib/cmake/opencascade")
+if(WIN32)
+    set(CMAKE_PREFIX_PATH "E:/Repository/OpenCASCADE/7.7.0/opencascade-7.7.0/cmake")
+else()
+    set(CMAKE_PREFIX_PATH "~/Repository/OpenCASCADE/latest/lib/cmake/opencascade")
+endif()
 
 # Find OpenCASCADE components
 find_package(OpenCASCADE REQUIRED)
@@ -20,6 +24,9 @@ include_directories("include")
 
 # Create the executable
 add_library(${PROJECT_NAME} ${srcs})
+
+add_executable("main" "src/main.cc")
+target_link_libraries("main" ${PROJECT_NAME})
 
 if(OpenCASCADE_FOUND)
     message(STATUS "OpenCASCADE found: version ${OpenCASCADE_VERSION}")
@@ -38,7 +45,3 @@ else()
     message(STATUS "OpenMP not found")
     
 endif()
-
-
-add_executable("main" "src/main.cc")
-target_link_libraries("main" ${PROJECT_NAME})

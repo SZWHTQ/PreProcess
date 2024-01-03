@@ -304,9 +304,9 @@ void Model::fill_with_particle_omp(double _dx, bool verbose)
 #pragma omp parallel
     {
 #pragma omp for collapse(3)
-        for (size_t i = 0; i < x_num; i++) {
-            for (size_t j = 0; j < y_num; j++) {
-                for (size_t k = 0; k < z_num; k++) {
+        for (long i = 0; i < x_num; i++) {
+            for (long j = 0; j < y_num; j++) {
+                for (long k = 0; k < z_num; k++) {
                     gp_Pnt point(
                         min_x + (i + 0.5) * dx,
                         min_y + (j + 0.5) * dx,
