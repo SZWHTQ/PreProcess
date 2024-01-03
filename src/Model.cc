@@ -22,8 +22,6 @@
 
 bool compare_file_extension(const std::string& filename, const std::string& extension)
 {
-    // #include <algorithm> // Add this line
-
     size_t dotPosition = filename.find_last_of('.');
 
     if (dotPosition != std::string::npos) {
@@ -196,6 +194,9 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
     std::mutex particles_mutex; // Mutex for synchronizing access to particles vector
 
     if (verbose) {
+        std::ios_base::sync_with_stdio(false);
+        std::cin.tie(nullptr);
+        std::cout.tie(nullptr);
         std::cout << "Filling " << name << "..." << std::endl;
         std::cout << "Max coordinate: " << max_coor.X() << ", " << max_coor.Y() << ", " << max_coor.Z() << std::endl;
         std::cout << "Min coordinate: " << min_coor.X() << ", " << min_coor.Y() << ", " << min_coor.Z() << std::endl;
@@ -229,25 +230,22 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
 
             if (verbose) {
                 std::lock_guard<std::mutex> lock(particles_mutex);
-                std::ios_base::sync_with_stdio(false);
-                std::cin.tie(nullptr);
-                std::cout.tie(nullptr);
                 count++;
                 percent = (double)count / total_num;
                 elapsed = T.elapsed();
-                if (count % interval == 0) {
+                if (count % interval == 0 || count == total_num) {
                     iter_per_second = interval / (t.elapsed() + std::numeric_limits<double>::min());
                     t.reset();
+                    std::cout << "\r"
+                              << std::setprecision(2)
+                              << "Progress: " << percent * 100 << "%, "
+                              << std::setprecision(1)
+                              << "Elapsed: " << elapsed << "s, "
+                              << "Estimated: " << elapsed / (percent + std::numeric_limits<double>::min()) * (1 - percent) << "s, "
+                              << iter_per_second << "it/s, "
+                              << "Particle number: " << particles.size();
+                    std::cout.flush();
                 }
-                std::cout << "\r"
-                          << std::setprecision(2)
-                          << "Progress: " << percent * 100 << "%, "
-                          << std::setprecision(1)
-                          << "Elapsed: " << elapsed << "s, "
-                          << "Estimated: " << elapsed / (percent + std::numeric_limits<double>::min()) * (1 - percent) << "s, "
-                          << iter_per_second << "it/s, "
-                          << "Particle number: " << particles.size();
-                std::cout.flush();
             }
         };
 

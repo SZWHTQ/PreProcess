@@ -4,6 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${default}",
+                "${workspaceFolder}/**",
                 "${workspaceFolder}/include",
                 "~/Repository/OpenCASCADE/latest/include/opencascade"
             ],
@@ -13,7 +14,7 @@
             "compilerArgs": [
                 "-DNDEBUG"
             ],
-            "configurationProvider": "ms-vscode.cmake-tools"
+            "configurationProvider": "ms-vscode.cpptools"
         }
     ],
     "version": 4
