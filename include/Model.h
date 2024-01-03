@@ -33,7 +33,7 @@ public:
     };
 
     [[nodiscard]] std::tuple<gp_Pnt, gp_Pnt> get_max_min_coor() const;
-    bool contain(gp_Pnt* point) const;
+    bool contain(const gp_Pnt& point) const;
     void fill_with_particle(double dx, bool verbose=true);
     void fill_with_particle_omp(double dx, bool verbose=true);
     void fill_with_particle_parallel(double dx, bool verbose=false);

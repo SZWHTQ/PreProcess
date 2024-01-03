@@ -80,6 +80,7 @@ void gen_MDF()
     //     std::cout << model->name << ": " << model->particles.size() << std::endl;
     // }
 
+    // Duplicate particles along z axis 4 times
     for (auto&& model : model_list) {
         auto& P = model->particles;
         int duplicate_num = 4;
@@ -131,9 +132,7 @@ void gen_PZG()
     Model Cover(2, "Cover", "./Model/PZG/201BAOHUZHAO.STEP", library.get["2A14T4"]);
     Model Connector(3, "Connector", "./Model/PZG/301CEBAN.STEP", library.get["2A14T6"]);
     Model Board(4, "Board", "./Model/PZG/901HUXINGBAN.STEP", library.get["2A14T6"]);
-    //  Use Method 2, direct
     Model Bolts(5, "Bolts", "./Model/PZG/Bolts.STEP", library.get["steel"]);
-    //  Or user defined material
     Model Rdx(6, "RDX", "./Model/PZG/RDX_67.step", library.get["RDX"]);
 
     const bool verbose = true;

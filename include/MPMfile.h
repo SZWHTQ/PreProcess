@@ -82,8 +82,8 @@ public:
     } contact_parameters;
 
     MPM_File() = default;
-    explicit MPM_File(std::string _name = "test")
-        : name(std::move(_name)) {};
+    explicit MPM_File(std::string name_ = "test")
+        : name(std::move(name_)) {};
 
     size_t get_component_num();
     size_t get_particle_num();

@@ -102,14 +102,14 @@ std::tuple<gp_Pnt, gp_Pnt> Model::get_max_min_coor() const
     return std::tie(max_coor, min_coor);
 }
 
-bool Model::contain(gp_Pnt* point) const
+bool Model::contain(const gp_Pnt& point) const
 {
     // Create a vertex from the test point
     // TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(testPoint);
 
     // Use BRepClass3d_SolidClassifier to check if the vertex is inside the shape
     BRepClass3d_SolidClassifier classifier(shape);
-    classifier.Perform(*point, 1e-9);
+    classifier.Perform(point, 1e-9);
 
     // Check the result of the classification
     return (classifier.State() == TopAbs_IN);
@@ -148,7 +148,7 @@ void Model::fill_with_particle(double _dx, bool verbose)
                     min_coor.X() + (i + 0.5) * dx,
                     min_coor.Y() + (j + 0.5) * dx,
                     min_coor.Z() + (k + 0.5) * dx);
-                if (contain(&point)) {
+                if (contain(point)) {
                     particles.emplace_back(point.X(), point.Y(), point.Z());
                 }
                 if (verbose) {
@@ -207,12 +207,11 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
     Timer T;
     {
         const size_t total_num = x_num * y_num * z_num;
-        const size_t interval = 1e2;
+        const size_t interval = 5e2;
         size_t count = 0;
         const double min_x = min_coor.X(), min_y = min_coor.Y(), min_z = min_coor.Z();
         double percent = 0, elapsed = 0, iter_per_second = 0;
 
-        ThreadPool thread_pool(std::thread::hardware_concurrency());
         Timer t;
 
         particles.reserve(total_num);
@@ -223,13 +222,16 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
                 min_y + (j + 0.5) * dx,
                 min_z + (k + 0.5) * dx);
 
-            if (contain(&point)) {
+            if (contain(point)) {
                 std::lock_guard<std::mutex> lock(particles_mutex);
-                particles.emplace_back(point.X(), point.Y(), point.Z());
+                particles.emplace_back(point);
             }
 
             if (verbose) {
                 std::lock_guard<std::mutex> lock(particles_mutex);
+                std::ios_base::sync_with_stdio(false);
+                std::cin.tie(nullptr);
+                std::cout.tie(nullptr);
                 count++;
                 percent = (double)count / total_num;
                 elapsed = T.elapsed();
@@ -249,10 +251,11 @@ void Model::fill_with_particle_parallel(double _dx, bool verbose)
             }
         };
 
+        ThreadPool pool(std::thread::hardware_concurrency());
         for (size_t i = 0; i < x_num; ++i) {
             for (size_t j = 0; j < y_num; ++j) {
                 for (size_t k = 0; k < z_num; ++k) {
-                    thread_pool.enqueue([thread_function, i, j, k] { return thread_function(i, j, k); });
+                    pool.enqueue([thread_function, i, j, k] { return thread_function(i, j, k); });
                 }
             }
         }
@@ -311,7 +314,7 @@ void Model::fill_with_particle_omp(double _dx, bool verbose)
                         min_y + (j + 0.5) * dx,
                         min_z + (k + 0.5) * dx);
 
-                    if (contain(&point)) {
+                    if (contain(point)) {
 #pragma omp critical
                         {
                             particles.emplace_back(point.X(), point.Y(), point.Z());

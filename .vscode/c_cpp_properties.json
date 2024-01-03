@@ -5,8 +5,7 @@
             "includePath": [
                 "${default}",
                 "${workspaceFolder}/include",
-                "~/Repository/OpenCASCADE/latest/include/opencascade",
-                "${workspaceFolder}/include"
+                "~/Repository/OpenCASCADE/latest/include/opencascade"
             ],
             "defines": [],
             "cStandard": "c17",
