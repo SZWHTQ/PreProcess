@@ -62,11 +62,23 @@ Johnson_Cook Material_Library::_2A14T4(
 
 Explosive Material_Library::RDX(1.67e-3, 7420);
 
+Simplified_Johnson_Cook Material_Library::Pb(
+    11.34e-3,
+    1.6e4,
+    0.44,
+    8.485,
+    17.32,
+    0.392,
+    0,
+    1e-6,
+    1);
+
 Material_Library Material_Library::library;
 
 Material_Library::Material_Library()
 {
-    steel.eos = new Mie_Gruneisen(steel.id,
+    steel.eos = new Mie_Gruneisen(
+        steel.id,
         4569,
         1.49,
         0,
@@ -76,7 +88,8 @@ Material_Library::Material_Library()
     steel.name = "steel";
     add(&steel);
 
-    _2A14T6.eos = new Mie_Gruneisen(_2A14T6.id,
+    _2A14T6.eos = new Mie_Gruneisen(
+        _2A14T6.id,
         4080,
         1.86,
         0,
@@ -85,7 +98,8 @@ Material_Library::Material_Library()
     _2A14T6.name = "2A14T6";
     add(&_2A14T6);
 
-    _2A14T4.eos = new Mie_Gruneisen(_2A14T4.id,
+    _2A14T4.eos = new Mie_Gruneisen(
+        _2A14T4.id,
         4080,
         1.86,
         0,
@@ -94,7 +108,8 @@ Material_Library::Material_Library()
     _2A14T4.name = "2A14T4";
     add(&_2A14T4);
 
-    RDX.eos = new Jones_Wilkins_Less(RDX.id,
+    RDX.eos = new Jones_Wilkins_Less(
+        RDX.id,
         611.3e5,
         10.65e5,
         4.4,
@@ -103,6 +118,17 @@ Material_Library::Material_Library()
         6530);
     RDX.name = "RDX";
     add(&RDX);
+
+    Pb.eos = new Mie_Gruneisen(
+        Pb.id,
+        2092,
+        1.452,
+        0,
+        0,
+        2,
+        0.54);
+    Pb.name = "Pb";
+    add(&Pb);
 }
 
 Material_Library& Material_Library::get_library()

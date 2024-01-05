@@ -1,7 +1,7 @@
 // Usage Example
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 #include "Explosive.h"
@@ -34,47 +34,55 @@ void gen_MDF()
     //  Use Method 2, direct
     Model Bolts(5, "Bolts", "./Model/MDF/Bolts.STEP", &Material_Library::steel);
     //  Or user defined material
-    Model Rdx(6, "RDX", "./Model/MDF/RDX_48_COMSOL.STEP", &RDX);
+    Model Rdx(6, "RDX", "./Model/MDF/RDX_20.STEP", &RDX);
+    Model PbRing(7, "PbRing", "./Model/MDF/PbRing_20_120.STEP", library.get["Pb"]);
 
 // Fill with particles
 #ifdef NDEBUG
     const bool verbose = true;
-    Separator.fill_with_particle_parallel(0.8, verbose);
-    Cover.fill_with_particle_parallel(0.8, verbose);
-    Connector.fill_with_particle_parallel(1, verbose);
-    Board.fill_with_particle_parallel(1, verbose);
+    Separator.fill_with_particle_parallel(1, verbose);
+    Cover.fill_with_particle_parallel(1, verbose);
+    Connector.fill_with_particle_parallel(1.5, verbose);
+    Board.fill_with_particle_parallel(1.5, verbose);
     Bolts.fill_with_particle_parallel(1, verbose);
-    // Rdx.fill_with_particle_parallel(0.65, verbose);
+    Rdx.fill_with_particle_parallel(0.5, verbose);
+    PbRing.fill_with_particle_parallel(0.5, verbose);
 #else
     Separator.fill_with_particle(2);
     Cover.fill_with_particle(2);
     Connector.fill_with_particle(3);
     Board.fill_with_particle(3);
     Bolts.fill_with_particle(2);
-    // Rdx.fill_with_particle(1);
+    Rdx.fill_with_particle(1);
+    PbRing.fill_with_particle(1, verbose);
 #endif
 
     // Another kind of RDX particle distribution
-    double x = 1.8, y = 0, z = 400;
-    double radius = 0.48;
-    Rdx.dx = 0.25;
-    size_t num_r = std::lround(radius / Rdx.dx + 0.5);
-    size_t num_theta = 1;
-    double theta = 2 * M_PI / (double)(num_theta), phase = M_PI;
-    size_t num_z = std::lround(40 / Rdx.dx + 0.5);
-    for (size_t k = 0; k < num_z; k++) {
-        for (size_t i = 0; i < num_r; i++) {
-            for (size_t j = 0; j < num_theta; j++) {
-                double _r = radius * (i + 0.5) / num_r;
-                double x_ = x + _r * cos(theta * j + phase);
-                double y_ = y + _r * sin(theta * j + phase);
-                double z_ = z - (k + 0.5) * Rdx.dx;
-                Rdx.particles.emplace_back(x_, y_, z_);
-            }
-        }
+    // double x = 1.8, y = 0, z = 400;
+    // double radius = 0.48;
+    // Rdx.dx = 0.25;
+    // size_t num_r = std::lround(radius / Rdx.dx + 0.5);
+    // size_t num_theta = 1;
+    // double theta = 2 * M_PI / (double)(num_theta), phase = M_PI;
+    // size_t num_z = std::lround(40 / Rdx.dx + 0.5);
+    // for (size_t k = 0; k < num_z; k++) {
+    //     for (size_t i = 0; i < num_r; i++) {
+    //         for (size_t j = 0; j < num_theta; j++) {
+    //             double _r = radius * (i + 0.5) / num_r;
+    //             double x_ = x + _r * cos(theta * j + phase);
+    //             double y_ = y + _r * sin(theta * j + phase);
+    //             double z_ = z - (k + 0.5) * Rdx.dx;
+    //             Rdx.particles.emplace_back(x_, y_, z_);
+    //         }
+    //     }
+    // }
+
+    // Offset explosive and Pb Ring
+    {
+        auto EXP = { &Rdx, &PbRing };
     }
 
-    auto model_list = { &Separator, &Cover, &Connector, &Board, &Bolts, &Rdx };
+    auto model_list = { &Separator, &Cover, &Connector, &Board, &Bolts, &Rdx, &PbRing };
 
     // for (auto& model : model_list) {
     //     std::cout << model->name << ": " << model->particles.size() << std::endl;
@@ -99,15 +107,15 @@ void gen_MDF()
         MDF.add(*model);
     }
 
-    MDF.dx = 0.75;
-    MDF.dCell_scale = 1.8;
-    MDF.end_time = 0.05;
+    MDF.dx = 1;
+    MDF.dCell_scale = 2;
+    MDF.end_time = 0.1;
     MDF.out_time = 5e-4;
     MDF.rpt_time = 1.25e-4;
-    MDF.dt_scale = 0.05;
+    MDF.dt_scale = 0.1;
 
-    MDF.down_extend.x = 15;
-    MDF.up_extend.x = 15;
+    MDF.down_extend.x = 20;
+    MDF.up_extend.x = 20;
     MDF.down_extend.z = 40 * 4 + 0.5 * MDF.dx;
     MDF.up_extend.z = 0.5 * MDF.dx;
 
@@ -193,7 +201,7 @@ void gen_PZG()
 
     PZG.dx = 0.75;
     PZG.dCell_scale = 2;
-    PZG.end_time = 0.05;
+    PZG.end_time = 0.2;
     PZG.out_time = 5e-4;
     PZG.rpt_time = 1.25e-4;
 

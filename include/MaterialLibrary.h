@@ -9,6 +9,7 @@
 //  Children
 #include "Explosive.h"
 #include "JohnsonCook.h"
+#include "SimplifiedJohnsonCook.h"
 
 // Equation of State
 //  Parent
@@ -23,6 +24,7 @@ public:
     static Johnson_Cook _2A14T6;
     static Johnson_Cook _2A14T4;
     static Explosive RDX;
+    static Simplified_Johnson_Cook Pb;
 
     // Add material to the library
     Material_Library(Material_Library const&) = delete;
