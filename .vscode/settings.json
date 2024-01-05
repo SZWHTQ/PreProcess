@@ -75,7 +75,9 @@
         "variant": "cpp",
         "*.inc": "cpp",
         "future": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "bitset": "cpp",
+        "codecvt": "cpp"
     },
     "C_Cpp.default.compilerPath": "/home/tengqing/Repository/bin/clang++",
     "cmake.debugConfig": {

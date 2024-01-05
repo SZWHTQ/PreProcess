@@ -13,7 +13,7 @@ else()
     set(CMAKE_PREFIX_PATH "~/Repository/OpenCASCADE/latest/lib/cmake/opencascade")
 endif()
 
-# Find OpenCASCADE components
+# Find OpenCASCADE
 find_package(OpenCASCADE REQUIRED)
 find_package(OpenMP)
 

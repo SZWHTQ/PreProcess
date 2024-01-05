@@ -84,6 +84,9 @@ public:
     MPM_File() = default;
     explicit MPM_File(std::string name_ = "test")
         : name(std::move(name_)) {};
+    ~MPM_File() {
+        models.clear();
+    }
 
     size_t get_component_num();
     size_t get_particle_num();

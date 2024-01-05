@@ -10,10 +10,10 @@ protected:
     static size_t instanceCount;
 
 public:
-    size_t id;
+    size_t id = 0;
     size_t local_index=0;
-    std::string name;
-    const double density;
+    std::string name = "";
+    const double density = 0;
 
     Equation_of_State* eos = nullptr;
 
