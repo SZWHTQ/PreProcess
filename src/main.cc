@@ -13,14 +13,14 @@
 #include "MaterialLibrary.h"
 #include "Model.h"
 
-const TopoDS_Shape make_cylinder(double radius, double height, gp_Pnt center)
+const TopoDS_Shape create_cylinder(double radius, double height, gp_Pnt center)
 {
     gp_Ax2 axis(center, gp_Dir(0, 0, 1));
     BRepPrimAPI_MakeCylinder cylinder(axis, radius, height);
     return cylinder.Shape();
 }
 
-const TopoDS_Shape make_hollow_cylinder(double radius, double height, double thickness, gp_Pnt center)
+const TopoDS_Shape create_hollow_cylinder(double radius, double height, double thickness, gp_Pnt center)
 {
     gp_Ax2 axis(center, gp_Dir(0, 0, 1));
     BRepPrimAPI_MakeCylinder cylinder(axis, radius, height);
@@ -60,8 +60,8 @@ void gen_MDF()
     const double rdx_radius = 0.3;
     const double pb_ring_thicknes = 1;
     const gp_Pnt center(1.8, 0, 360);
-    Rdx.shape = make_cylinder(rdx_radius, 40, center);
-    PbRing.shape = make_hollow_cylinder(rdx_radius + pb_ring_thicknes, 40, pb_ring_thicknes, center);
+    Rdx.shape = create_cylinder(rdx_radius, 40, center);
+    PbRing.shape = create_hollow_cylinder(rdx_radius + pb_ring_thicknes, 40, pb_ring_thicknes, center);
     Rdx.material = &RDX;
     PbRing.material = library.get["Pb"];
 
