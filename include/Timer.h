@@ -4,10 +4,10 @@
 #include <chrono>
 
 class Timer {
-private:
+   private:
     std::chrono::steady_clock::time_point startTime;
 
-public:
+   public:
     Timer() { reset(); };
     void reset();
     [[nodiscard]] double elapsed() const;

@@ -7,4 +7,5 @@ cmake-build-release
 .DS_store
 .idea
 .cache
+Xcode
 # MDF.cc

@@ -11,13 +11,6 @@
 #include "JohnsonCook.h"
 #include "SimplifiedJohnsonCook.h"
 
-// Equation of State
-//  Parent
-#include "EquationOfState.h"
-//  Children
-#include "JonesWilkinsLee.h"
-#include "MieGruneisen.h"
-
 class Material_Library {
 public:
     static Johnson_Cook steel;

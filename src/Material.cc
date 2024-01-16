@@ -2,14 +2,8 @@
 
 size_t Material::instanceCount = 0;
 
-Material::Material(double _density)
-    : density(_density)
-    , id(++instanceCount)
-{
+Material::Material(double _density) : density(_density), id(++instanceCount) {
     name = "Material_" + std::to_string(id);
 }
 
-Material::~Material()
-{
-    --instanceCount;
-}
+Material::~Material() { --instanceCount; }

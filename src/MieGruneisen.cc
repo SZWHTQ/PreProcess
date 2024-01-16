@@ -1,7 +1,6 @@
 #include "MieGruneisen.h"
 
-std::string Mie_Gruneisen::to_string(size_t count)
-{
+std::string Mie_Gruneisen::to_string(size_t count) {
     std::string str = "seos " + std::to_string(count) + " ";
     str += std::to_string(type) + " ";
     str += std::to_string(C) + " ";

@@ -1,27 +1,25 @@
 // Usage Example
 
-#include <cmath>
 #include <iostream>
 #include <vector>
 
 #include "BRepAlgoAPI_Cut.hxx"
 #include "BRepPrimAPI_MakeCylinder.hxx"
-
 #include "Explosive.h"
 #include "JonesWilkinsLee.h"
 #include "MPMfile.h"
 #include "MaterialLibrary.h"
 #include "Model.h"
 
-const TopoDS_Shape create_cylinder(double radius, double height, gp_Pnt center)
-{
+const TopoDS_Shape create_cylinder(double radius, double height,
+                                   gp_Pnt center) {
     gp_Ax2 axis(center, gp_Dir(0, 0, 1));
     BRepPrimAPI_MakeCylinder cylinder(axis, radius, height);
     return cylinder.Shape();
 }
 
-const TopoDS_Shape create_hollow_cylinder(double radius, double height, double thickness, gp_Pnt center)
-{
+const TopoDS_Shape create_hollow_cylinder(double radius, double height,
+                                          double thickness, gp_Pnt center) {
     gp_Ax2 axis(center, gp_Dir(0, 0, 1));
     BRepPrimAPI_MakeCylinder cylinder(axis, radius, height);
     BRepPrimAPI_MakeCylinder hollow(axis, radius - thickness, height);
@@ -29,39 +27,39 @@ const TopoDS_Shape create_hollow_cylinder(double radius, double height, double t
     return cut.Shape();
 }
 
-void gen_MDF()
-{
+void gen_MDF() {
     auto& library = Material_Library::get_library();
 
     // User defined material
     Explosive RDX(1.67e-3, 7420);
-    RDX.eos = new Jones_Wilkins_Less(RDX.id,
-        611.3e5,
-        10.65e5,
-        4.4,
-        1.2,
-        0.32,
-        6530);
+    RDX.eos =
+        new Jones_Wilkins_Less(RDX.id, 611.3e5, 10.65e5, 4.4, 1.2, 0.32, 6530);
     RDX.name = "my_RDX";
 
     // Material
     //  Use Method 1, get from library
-    Model Separator(1, "Separator", "./Model/MDF/101FENLIBAN.STEP", library.get["2A14T6"]);
-    Model Cover(2, "Cover", "./Model/MDF/201BAOHUZHAO.STEP", library.get["2A14T4"]);
-    Model Connector(3, "Connector", "./Model/MDF/301JIEBAN.STEP", library.get["2A14T6"]);
-    Model Board(4, "Board", "./Model/MDF/401CEBAN_FIX.STEP", library.get["2A14T6"]);
+    Model Separator(1, "Separator", "./Model/MDF/101FENLIBAN.STEP",
+                    library.get["2A14T6"]);
+    Model Cover(2, "Cover", "./Model/MDF/201BAOHUZHAO.STEP",
+                library.get["2A14T4"]);
+    Model Connector(3, "Connector", "./Model/MDF/301JIEBAN.STEP",
+                    library.get["2A14T6"]);
+    Model Board(4, "Board", "./Model/MDF/401CEBAN_FIX.STEP",
+                library.get["2A14T6"]);
     //  Use Method 2, direct
     Model Bolts(5, "Bolts", "./Model/MDF/Bolts.STEP", &Material_Library::steel);
     //  Or user defined material
     // Model Rdx(6, "RDX", "./Model/MDF/RDX_20.STEP", &RDX);
-    // Model PbRing(7, "PbRing", "./Model/MDF/PbRing_20_120.STEP", library.get["Pb"]);
+    // Model PbRing(7, "PbRing", "./Model/MDF/PbRing_20_120.STEP",
+    // library.get["Pb"]);
     Model Rdx(6, "RDX");
     Model PbRing(7, "PbRing");
     const double rdx_radius = 0.3;
     const double pb_ring_thicknes = 1;
     const gp_Pnt center(1.8, 0, 360);
     Rdx.shape = create_cylinder(rdx_radius, 40, center);
-    PbRing.shape = create_hollow_cylinder(rdx_radius + pb_ring_thicknes, 40, pb_ring_thicknes, center);
+    PbRing.shape = create_hollow_cylinder(rdx_radius + pb_ring_thicknes, 40,
+                                          pb_ring_thicknes, center);
     Rdx.material = &RDX;
     PbRing.material = library.get["Pb"];
 
@@ -107,10 +105,12 @@ void gen_MDF()
         }
      */
 
-    auto model_list = { &Separator, &Cover, &Connector, &Board, &Bolts, &Rdx, &PbRing };
+    auto model_list = {&Separator, &Cover, &Connector, &Board,
+                       &Bolts,     &Rdx,   &PbRing};
 
     // for (auto& model : model_list) {
-    //     std::cout << model->name << ": " << model->particles.size() << std::endl;
+    //     std::cout << model->name << ": " << model->particles.size() <<
+    //     std::endl;
     // }
 
     // Duplicate particles along z axis 4 times
@@ -159,14 +159,17 @@ void gen_MDF()
     // delete RDX.eos;
 }
 
-void gen_PZG()
-{
+void gen_PZG() {
     auto& library = Material_Library::get_library();
 
-    Model Separator(1, "Separator", "./Model/PZG/101FENLIBAN.STEP", library.get["2A14T6"]);
-    Model Cover(2, "Cover", "./Model/PZG/201BAOHUZHAO.STEP", library.get["2A14T4"]);
-    Model Connector(3, "Connector", "./Model/PZG/301CEBAN.STEP", library.get["2A14T6"]);
-    Model Board(4, "Board", "./Model/PZG/901HUXINGBAN.STEP", library.get["2A14T6"]);
+    Model Separator(1, "Separator", "./Model/PZG/101FENLIBAN.STEP",
+                    library.get["2A14T6"]);
+    Model Cover(2, "Cover", "./Model/PZG/201BAOHUZHAO.STEP",
+                library.get["2A14T4"]);
+    Model Connector(3, "Connector", "./Model/PZG/301CEBAN.STEP",
+                    library.get["2A14T6"]);
+    Model Board(4, "Board", "./Model/PZG/901HUXINGBAN.STEP",
+                library.get["2A14T6"]);
     Model Bolts(5, "Bolts", "./Model/PZG/Bolts.STEP", library.get["steel"]);
     Model Rdx(6, "RDX", "./Model/PZG/RDX_67.step", library.get["RDX"]);
 
@@ -178,7 +181,7 @@ void gen_PZG()
     Bolts.fill_with_particle(1, verbose);
     Rdx.fill_with_particle(0.5, verbose);
 
-    auto model_list = { &Separator, &Cover, &Connector, &Board, &Bolts, &Rdx };
+    auto model_list = {&Separator, &Cover, &Connector, &Board, &Bolts, &Rdx};
 
     for (auto&& model : model_list) {
         auto& P = model->particles;
@@ -222,8 +225,7 @@ void gen_PZG()
     PZG.write();
 }
 
-int main()
-{
+int main() {
     std::cout << "***MDF***" << std::endl;
     gen_MDF();
     std::cout << "Done" << std::endl;
