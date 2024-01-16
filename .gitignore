@@ -6,4 +6,5 @@ cmake-build-release
 *.mpm
 .DS_store
 .idea
+.cache
 # MDF.cc

@@ -10,7 +10,7 @@
 
 size_t MPM_File::get_component_num()
 {
-    std::unordered_set<int> components;
+    std::unordered_set<size_t> components;
     for (const auto& model : models) {
         components
             .insert(model->id);
@@ -32,7 +32,7 @@ size_t MPM_File::get_particle_num()
 
 size_t MPM_File::get_material_num()
 {
-    std::unordered_set<int> material_id;
+    std::unordered_set<size_t> material_id;
     for (const auto& model : models) {
         material_id
             .insert(model
@@ -129,7 +129,7 @@ void MPM_File::write()
          << detonation_point.z << "\n";
 
     // Material
-    std::unordered_set<int> id_set;
+    std::unordered_set<size_t> id_set;
     size_t count = 0;
     file << "\n";
     file << "material\n";

@@ -5,6 +5,7 @@ project(
 )
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set OpenCASCADE directory (change this to the actual path on your system)
 if(WIN32)
