@@ -9,8 +9,8 @@
 class Material;
 
 class Model {
-public:
-    size_t id; // component id
+   public:
+    size_t id;  // component id
     std::string name;
     TopoDS_Shape shape;
 
@@ -19,25 +19,18 @@ public:
 
     Material* material = nullptr;
 
-    Model(size_t _id, std::string _model_name)
-        : id(_id)
-        , name(std::move(_model_name)) {};
-    Model(
-        size_t _id,
-        std::string _model_name,
-        const std::string& _file_path,
-        Material* _material);
-    ~Model()
-    {
-        particles.clear();
-    };
+    Model(size_t id_, std::string modelName_)
+        : id(id_), name(std::move(modelName_)){};
+    Model(size_t id_, std::string modelName_, const std::string& filePath_,
+          Material* material_);
+    ~Model() { particles.clear(); };
 
-    std::tuple<gp_Pnt, gp_Pnt> get_max_min_coor() const;
+    std::tuple<gp_Pnt, gp_Pnt> getMaxMinCoordinates() const;
     bool contain(const gp_Pnt& point) const;
-    void fill_with_particle(const double dx, const bool verbose = false);
-    void fill_with_particle_omp(const double dx, const bool verbose = false);
-    void fill_with_particle_sequential(const double dx, const bool verbose = true);
-    // void fill_with_particle_mpi(const double dx, const bool verbose = false);
+    void fill(const double dx, const bool verbose = false);
+    void fillWithOMP(const double dx, const bool verbose = false);
+    void fillSequentially(const double dx, const bool verbose = true);
+    // void fillMPI(const double dx, const bool verbose = false);
 };
 
 #endif

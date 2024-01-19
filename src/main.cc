@@ -7,18 +7,18 @@
 #include "BRepPrimAPI_MakeCylinder.hxx"
 #include "Explosive.h"
 #include "JonesWilkinsLee.h"
-#include "MPMfile.h"
+#include "Mpmfile.h"
 #include "MaterialLibrary.h"
 #include "Model.h"
 
-const TopoDS_Shape create_cylinder(double radius, double height,
+const TopoDS_Shape createCylinder(double radius, double height,
                                    gp_Pnt center) {
     gp_Ax2 axis(center, gp_Dir(0, 0, 1));
     BRepPrimAPI_MakeCylinder cylinder(axis, radius, height);
     return cylinder.Shape();
 }
 
-const TopoDS_Shape create_hollow_cylinder(double radius, double height,
+const TopoDS_Shape createHollowCylinder(double radius, double height,
                                           double thickness, gp_Pnt center) {
     gp_Ax2 axis(center, gp_Dir(0, 0, 1));
     BRepPrimAPI_MakeCylinder cylinder(axis, radius, height);
@@ -27,13 +27,13 @@ const TopoDS_Shape create_hollow_cylinder(double radius, double height,
     return cut.Shape();
 }
 
-void gen_MDF() {
-    auto& library = Material_Library::get_library();
+void generateMDF() {
+    auto& library = MaterialLibrary::get_library();
 
     // User defined material
     Explosive RDX(1.67e-3, 7420);
     RDX.eos =
-        new Jones_Wilkins_Less(RDX.id, 611.3e5, 10.65e5, 4.4, 1.2, 0.32, 6530);
+        new JonesWilkinsLee(RDX.id, 611.3e5, 10.65e5, 4.4, 1.2, 0.32, 6530);
     RDX.name = "my_RDX";
 
     // Material
@@ -47,7 +47,7 @@ void gen_MDF() {
     Model Board(4, "Board", "./Model/MDF/401CEBAN_FIX.STEP",
                 library.get["2A14T6"]);
     //  Use Method 2, direct
-    Model Bolts(5, "Bolts", "./Model/MDF/Bolts.STEP", &Material_Library::steel);
+    Model Bolts(5, "Bolts", "./Model/MDF/Bolts.STEP", &MaterialLibrary::steel);
     //  Or user defined material
     // Model Rdx(6, "RDX", "./Model/MDF/RDX_20.STEP", &RDX);
     // Model PbRing(7, "PbRing", "./Model/MDF/PbRing_20_120.STEP",
@@ -57,8 +57,8 @@ void gen_MDF() {
     const double rdx_radius = 0.3;
     const double pb_ring_thicknes = 1;
     const gp_Pnt center(1.8, 0, 360);
-    Rdx.shape = create_cylinder(rdx_radius, 40, center);
-    PbRing.shape = create_hollow_cylinder(rdx_radius + pb_ring_thicknes, 40,
+    Rdx.shape = createCylinder(rdx_radius, 40, center);
+    PbRing.shape = createHollowCylinder(rdx_radius + pb_ring_thicknes, 40,
                                           pb_ring_thicknes, center);
     Rdx.material = &RDX;
     PbRing.material = library.get["Pb"];
@@ -66,13 +66,13 @@ void gen_MDF() {
     // Fill with particles
 #ifdef NDEBUG
     const bool verbose = true;
-    Separator.fill_with_particle(1, verbose);
-    Cover.fill_with_particle(1, verbose);
-    Connector.fill_with_particle(1.5, verbose);
-    Board.fill_with_particle(1.5, verbose);
-    Bolts.fill_with_particle(1, verbose);
-    Rdx.fill_with_particle(0.5, verbose);
-    PbRing.fill_with_particle(0.5, verbose);
+    Separator.fill(1, verbose);
+    Cover.fill(1, verbose);
+    Connector.fill(1.5, verbose);
+    Board.fill(1.5, verbose);
+    Bolts.fill(1, verbose);
+    Rdx.fill(0.5, verbose);
+    PbRing.fill(0.5, verbose);
 #else
     Separator.fill_with_particle_sequential(2);
     Cover.fill_with_particle_sequential(2);
@@ -126,8 +126,8 @@ void gen_MDF() {
         }
     }
 
-    MPM_File MDF("MDF");
-    MDF.unit = MPM_File::UNIT::MMGS_ms;
+    MpmFile MDF("MDF");
+    MDF.unit = MpmFile::UNIT::MMGS_ms;
     for (auto&& model : model_list) {
         MDF.add(*model);
     }
@@ -144,7 +144,7 @@ void gen_MDF() {
     MDF.down_extend.z = 40 * 4 + 0.5 * MDF.dx;
     MDF.up_extend.z = 0.5 * MDF.dx;
 
-    typedef MPM_File::BOUNDARY bound;
+    typedef MpmFile::BOUNDARY bound;
     MDF.down_boundary.z = (int)bound::SYMMETRY;
     MDF.down_boundary.y = (int)bound::FIX;
     MDF.up_boundary.y = (int)bound::SYMMETRY;
@@ -153,14 +153,14 @@ void gen_MDF() {
     MDF.detonation_point.z = 400;
     MDF.Jaumann = true;
     MDF.Contact = true;
-    MDF.contact_parameters.type = MPM_File::CONTACT::LAGRANGIAN;
+    MDF.contact_parameters.type = MpmFile::CONTACT::LAGRANGIAN;
 
     MDF.write();
     // delete RDX.eos;
 }
 
-void gen_PZG() {
-    auto& library = Material_Library::get_library();
+void generatePZG() {
+    auto& library = MaterialLibrary::get_library();
 
     Model Separator(1, "Separator", "./Model/PZG/101FENLIBAN.STEP",
                     library.get["2A14T6"]);
@@ -174,12 +174,12 @@ void gen_PZG() {
     Model Rdx(6, "RDX", "./Model/PZG/RDX_67.step", library.get["RDX"]);
 
     const bool verbose = true;
-    Separator.fill_with_particle(1, verbose);
-    Cover.fill_with_particle(1, verbose);
-    Connector.fill_with_particle(1.5, verbose);
-    Board.fill_with_particle(1.5, verbose);
-    Bolts.fill_with_particle(1, verbose);
-    Rdx.fill_with_particle(0.5, verbose);
+    Separator.fill(1, verbose);
+    Cover.fill(1, verbose);
+    Connector.fill(1.5, verbose);
+    Board.fill(1.5, verbose);
+    Bolts.fill(1, verbose);
+    Rdx.fill(0.5, verbose);
 
     auto model_list = {&Separator, &Cover, &Connector, &Board, &Bolts, &Rdx};
 
@@ -195,7 +195,7 @@ void gen_PZG() {
         }
     }
 
-    MPM_File PZG("PZG");
+    MpmFile PZG("PZG");
     for (auto&& model : model_list) {
         PZG.add(*model);
     }
@@ -211,28 +211,28 @@ void gen_PZG() {
     PZG.down_extend.z = 40 * 4 + 0.5 * PZG.dx;
     PZG.up_extend.z = 0.5 * PZG.dx;
 
-    PZG.down_boundary.z = (int)MPM_File::BOUNDARY::SYMMETRY;
-    PZG.down_boundary.y = (int)MPM_File::BOUNDARY::FIX;
-    PZG.up_boundary.y = (int)MPM_File::BOUNDARY::SYMMETRY;
+    PZG.down_boundary.z = (int)MpmFile::BOUNDARY::SYMMETRY;
+    PZG.down_boundary.y = (int)MpmFile::BOUNDARY::FIX;
+    PZG.up_boundary.y = (int)MpmFile::BOUNDARY::SYMMETRY;
 
     PZG.detonation_point.x = 3.6;
     PZG.detonation_point.y = -0.5;
     PZG.detonation_point.z = 400;
     PZG.Jaumann = true;
     PZG.Contact = true;
-    PZG.contact_parameters.type = MPM_File::CONTACT::LAGRANGIAN;
+    PZG.contact_parameters.type = MpmFile::CONTACT::LAGRANGIAN;
 
     PZG.write();
 }
 
 int main() {
     std::cout << "***MDF***" << std::endl;
-    gen_MDF();
+    generateMDF();
     std::cout << "Done" << std::endl;
 
     std::cout << "\n\n";
 
     std::cout << "***PZG***" << std::endl;
-    gen_PZG();
+    generatePZG();
     std::cout << "Done" << std::endl;
 }

@@ -1,30 +1,29 @@
+#include <omp.h>
+
+#include <BRepBndLib.hxx>
+#include <BRepClass3d_SolidClassifier.hxx>
+#include <BRep_Tool.hxx>
+#include <Bnd_Box.hxx>
+#include <STEPControl_Reader.hxx>
+#include <StlAPI_Reader.hxx>
+#include <TopExp.hxx>
+#include <TopoDS.hxx>
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <limits>
-// #include <mpi.h>
-#include <omp.h>
-
 #include <string>
 #include <tuple>
 #include <utility>
 
 #include "ANSI.h"
-#include "BRepBndLib.hxx"
-#include "BRepClass3d_SolidClassifier.hxx"
-#include "BRep_Tool.hxx"
-#include "Bnd_Box.hxx"
 #include "Material.h"
 #include "Model.h"
-#include "STEPControl_Reader.hxx"
-#include "StlAPI_Reader.hxx"
 #include "ThreadPool.h"
 #include "Timer.h"
-#include "TopExp.hxx"
-#include "TopoDS.hxx"
 
-bool compare_file_extension(const std::string& filename,
-                            const std::string& extension) {
+bool compareFileExtension(const std::string& filename,
+                          const std::string& extension) {
     size_t dotPosition = filename.find_last_of('.');
 
     if (dotPosition != std::string::npos) {
@@ -43,15 +42,15 @@ bool compare_file_extension(const std::string& filename,
     return false;
 }
 
-Model::Model(size_t _id, std::string _model_name, const std::string& _file_path,
-             Material* _material) {
-    id = _id;
-    name = std::move(_model_name);
-    material = _material;
-    if (compare_file_extension(_file_path, "stp") ||
-        compare_file_extension(_file_path, "step")) {
+Model::Model(size_t id_, std::string modelName_, const std::string& filePath_,
+             Material* material_) {
+    id = id_;
+    name = std::move(modelName_);
+    material = material_;
+    if (compareFileExtension(filePath_, "stp") ||
+        compareFileExtension(filePath_, "step")) {
         STEPControl_Reader stepReader;
-        int status = stepReader.ReadFile(_file_path.c_str());
+        int status = stepReader.ReadFile(filePath_.c_str());
         stepReader.TransferRoots();
 
         if (status != IFSelect_RetDone) {
@@ -68,9 +67,9 @@ Model::Model(size_t _id, std::string _model_name, const std::string& _file_path,
 
         // Transfer the contents of the STEP file to a TopoDS_Shape
         shape = stepReader.Shape();
-    } else if (compare_file_extension(_file_path, "stl")) {
+    } else if (compareFileExtension(filePath_, "stl")) {
         StlAPI_Reader stlReader;
-        bool status = stlReader.Read(shape, _file_path.c_str());
+        bool status = stlReader.Read(shape, filePath_.c_str());
 
         if (!status) {
             std::cerr << "Error reading STL file." << std::endl;
@@ -79,7 +78,7 @@ Model::Model(size_t _id, std::string _model_name, const std::string& _file_path,
     }
 }
 
-std::tuple<gp_Pnt, gp_Pnt> Model::get_max_min_coor() const {
+std::tuple<gp_Pnt, gp_Pnt> Model::getMaxMinCoordinates() const {
     Bnd_Box bounding_box;
     double xmin, ymin, zmin, xmax, ymax, zmax;
 
@@ -101,9 +100,9 @@ bool Model::contain(const gp_Pnt& point) const {
     return (classifier.State() == TopAbs_IN);
 }
 
-void Model::fill_with_particle(const double _dx, const bool verbose) {
+void Model::fill(const double _dx, const bool verbose) {
     Model::dx = _dx;
-    auto [max_coor, min_coor] = get_max_min_coor();
+    auto [max_coor, min_coor] = getMaxMinCoordinates();
 
     auto x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
     auto y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
@@ -197,10 +196,10 @@ void Model::fill_with_particle(const double _dx, const bool verbose) {
     }
 }
 
-void Model::fill_with_particle_omp(const double _dx, const bool verbose) {
+void Model::fillWithOMP(const double _dx, const bool verbose) {
     Model::dx = _dx;
     // Get the max and min coordinate of the model
-    auto [max_coor, min_coor] = get_max_min_coor();
+    auto [max_coor, min_coor] = getMaxMinCoordinates();
 
     // Calculate the number of particles in each direction
     auto x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
@@ -291,11 +290,10 @@ void Model::fill_with_particle_omp(const double _dx, const bool verbose) {
     }
 }
 
-void Model::fill_with_particle_sequential(const double _dx,
-                                          const bool verbose) {
+void Model::fillSequentially(const double _dx, const bool verbose) {
     Model::dx = _dx;
     // Get the max and min coordinate of the model
-    auto [max_coor, min_coor] = get_max_min_coor();
+    auto [max_coor, min_coor] = getMaxMinCoordinates();
 
     // Calculate the number of particles in each direction
     auto x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
@@ -367,7 +365,7 @@ void Model::fill_with_particle_sequential(const double _dx,
 }
 
 /*
-void Model::fill_with_particle_mpi(const double _dx, const bool verbose)
+void Model::fillMPI(const double _dx, const bool verbose)
 {
     // Initialize MPI
     MPI_Init(NULL, NULL);
@@ -458,4 +456,5 @@ std::numeric_limits<double>::min()) * (1 - percent) << "s, "
 
     // Finalize MPI
     MPI_Finalize();
-} */
+}
+*/

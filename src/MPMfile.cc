@@ -2,12 +2,12 @@
 #include <iostream>
 #include <unordered_set>
 
-#include "MPMfile.h"
+#include "Mpmfile.h"
 #include "Material.h"
 #include "Model.h"
 #include "gp_Pnt.hxx"
 
-size_t MPM_File::get_component_num() {
+size_t MpmFile::getComponentNumber() {
     std::unordered_set<size_t> components;
     for (const auto& model : models) {
         components.insert(model->id);
@@ -16,7 +16,7 @@ size_t MPM_File::get_component_num() {
     return components.size();
 }
 
-size_t MPM_File::get_particle_num() {
+size_t MpmFile::getParticleNumber() {
     size_t num = 0;
     for (const auto& model : models) {
         num += model->particles.size();
@@ -25,7 +25,7 @@ size_t MPM_File::get_particle_num() {
     return particle_num;
 }
 
-size_t MPM_File::get_material_num() {
+size_t MpmFile::getMaterialNumber() {
     std::unordered_set<size_t> material_id;
     for (const auto& model : models) {
         material_id.insert(model->material->id);
@@ -34,7 +34,7 @@ size_t MPM_File::get_material_num() {
     return component_num;
 }
 
-std::tuple<gp_Pnt, gp_Pnt> MPM_File::get_max_min_coor() {
+std::tuple<gp_Pnt, gp_Pnt> MpmFile::getMaxMinCoordinates() {
     gp_Pnt max_coor, min_coor;
     max_coor.SetX(std::numeric_limits<double>::min());
     max_coor.SetY(std::numeric_limits<double>::min());
@@ -44,7 +44,7 @@ std::tuple<gp_Pnt, gp_Pnt> MPM_File::get_max_min_coor() {
     min_coor.SetZ(std::numeric_limits<double>::max());
 
     for (const auto& model : models) {
-        auto [max, min] = model->get_max_min_coor();
+        auto [max, min] = model->getMaxMinCoordinates();
         if (max.X() > max_coor.X()) {
             max_coor.SetX(max.X());
         }
@@ -68,11 +68,11 @@ std::tuple<gp_Pnt, gp_Pnt> MPM_File::get_max_min_coor() {
     return std::tie(max_coor, min_coor);
 }
 
-void MPM_File::add(const Model& model) {
+void MpmFile::add(const Model& model) {
     models.push_back(std::make_unique<Model>(model));
 }
 
-void MPM_File::write() {
+void MpmFile::write() {
     std::ofstream file;
     file.open(name + ".mpm", std::ios::out | std::ios::trunc);
     file << "mpm3d *** " << name << " ***\n";
@@ -83,14 +83,14 @@ void MPM_File::write() {
         default:
             break;
     }
-    file << "nbco " << get_component_num() << "\n";
+    file << "nbco " << getComponentNumber() << "\n";
     file << "nbbo " << models.size() << "\n";
-    file << "nbmp " << get_particle_num() << "\n";
-    file << "nmat " << get_material_num() << "\n";
+    file << "nbmp " << getParticleNumber() << "\n";
+    file << "nmat " << getMaterialNumber() << "\n";
 
     // Grid Span & Cell Size
     file << "\n";
-    auto [max, min] = get_max_min_coor();
+    auto [max, min] = getMaxMinCoordinates();
     file << "spx " << min.X() - down_extend.x << " " << max.X() + up_extend.x
          << "\n";
     file << "spy " << min.Y() - down_extend.y << " " << max.Y() + up_extend.y
@@ -120,8 +120,8 @@ void MPM_File::write() {
         bool is_new = id_set.insert(mat->id).second;
         if (is_new) {
             ++count;
-            mat->local_index = count;
-            file << mat->to_string() << "\n";
+            mat->localIndex = count;
+            file << mat->toString() << "\n";
         }
     }
     //  EoS
@@ -130,7 +130,7 @@ void MPM_File::write() {
         auto& eos = model->material->eos;
         bool is_new = id_set.insert(eos->id).second;
         if (is_new) {
-            file << eos->to_string(model->material->local_index) << "\n";
+            file << eos->toString(model->material->localIndex) << "\n";
         }
     }
 
@@ -195,7 +195,7 @@ void MPM_File::write() {
         file << "Particle "
              << "point " << model->id << " " << model->particles.size() << "\n";
         for (auto& particle : model->particles) {
-            file << ++count << " " << model->material->local_index << " "
+            file << ++count << " " << model->material->localIndex << " "
                  << model->material->density * pow(model->dx, 3) << " "
                  << particle.X() << " " << particle.Y() << " " << particle.Z()
                  << "\n";

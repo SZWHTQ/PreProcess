@@ -3,23 +3,16 @@
 
 #include <string>
 
-class Equation_of_State {
-protected:
+class EquationOfState {
+   protected:
     static size_t instanceCount;
 
-public:
+   public:
     size_t id;
-    explicit Equation_of_State(size_t _id)
-        : id(_id) {};
-    ~Equation_of_State()
-    {
-        --instanceCount;
-    };
-    static size_t getInstanceCount()
-    {
-        return instanceCount;
-    }
-    virtual std::string to_string(size_t count) = 0;
+    explicit EquationOfState(size_t _id) : id(_id){};
+    ~EquationOfState() { --instanceCount; };
+    static size_t getInstanceCount() { return instanceCount; }
+    virtual std::string toString(size_t count) = 0;
 };
 
 #endif

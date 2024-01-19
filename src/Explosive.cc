@@ -1,9 +1,9 @@
 #include "Explosive.h"
 
-std::string Explosive::to_string() {
-    std::string str = std::to_string(local_index) + " hiex ";
+std::string Explosive::toString() {
+    std::string str = std::to_string(localIndex) + " hiex ";
     str += std::to_string(density) + " ";
-    str += std::to_string(detonation_speed);
+    str += std::to_string(detonationSpeed);
 
     return str;
 }

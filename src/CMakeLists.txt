@@ -10,7 +10,7 @@ list(
     "${dir}/MaterialLibrary.cc"
     "${dir}/MieGruneisen.cc"
     "${dir}/Model.cc"
-    "${dir}/MPMfile.cc"
+    "${dir}/Mpmfile.cc"
     "${dir}/SimplifiedJohnsonCook.cc"
     "${dir}/Timer.cc"
 )

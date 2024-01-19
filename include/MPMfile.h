@@ -1,7 +1,6 @@
 #ifndef MPM_FILE_H
 #define MPM_FILE_H
 
-#include <fstream>
 #include <list>
 #include <memory>
 #include <string>
@@ -12,21 +11,21 @@
 
 class Model;
 
-struct Double_3D {
+struct Double3D {
     double x = 0, y = 0, z = 0;
 };
 
-struct Int_3D {
+struct Int3D {
     int x = 0, y = 0, z = 0;
 };
 
-class MPM_File {
-private:
+class MpmFile {
+   private:
     std::string name;
     std::list<std::unique_ptr<Model>> models;
-public:
 
-    double dx=0;
+   public:
+    double dx = 0;
     double dCell_scale = 1.8;
     double dt_scale = 0.1;
     double end_time = 0;
@@ -63,9 +62,9 @@ public:
         SYMMETRY,
     };
 
-    Int_3D down_boundary, up_boundary;
-    Double_3D down_extend, up_extend;
-    Double_3D detonation_point;
+    Int3D down_boundary, up_boundary;
+    Double3D down_extend, up_extend;
+    Double3D detonation_point;
 
     bool GIMP = true;
     bool Jaumann = true;
@@ -81,17 +80,14 @@ public:
         double body_norm = 2;
     } contact_parameters;
 
-    MPM_File() = default;
-    explicit MPM_File(std::string name_ = "test")
-        : name(std::move(name_)) {};
-    ~MPM_File() {
-        models.clear();
-    }
+    MpmFile() = default;
+    explicit MpmFile(std::string name_ = "test") : name(std::move(name_)){};
+    ~MpmFile() { models.clear(); }
 
-    size_t get_component_num();
-    size_t get_particle_num();
-    size_t get_material_num();
-    std::tuple<gp_Pnt, gp_Pnt> get_max_min_coor();
+    size_t getComponentNumber();
+    size_t getParticleNumber();
+    size_t getMaterialNumber();
+    std::tuple<gp_Pnt, gp_Pnt> getMaxMinCoordinates();
     void add(const Model& model);
     void write();
 };

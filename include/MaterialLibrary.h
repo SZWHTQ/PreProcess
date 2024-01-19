@@ -11,27 +11,26 @@
 #include "JohnsonCook.h"
 #include "SimplifiedJohnsonCook.h"
 
-class Material_Library {
-public:
-    static Johnson_Cook steel;
-    static Johnson_Cook _2A14T6;
-    static Johnson_Cook _2A14T4;
+class MaterialLibrary {
+   public:
+    static JohnsonCook steel;
+    static JohnsonCook _2A14T6;
+    static JohnsonCook _2A14T4;
     static Explosive RDX;
-    static Simplified_Johnson_Cook Pb;
+    static SimplifiedJohnsonCook Pb;
 
     // Add material to the library
-    Material_Library(Material_Library const&) = delete;
-    void operator=(Material_Library const&) = delete;
+    MaterialLibrary(MaterialLibrary const&) = delete;
+    void operator=(MaterialLibrary const&) = delete;
     void add(Material* material);
     std::map<std::string, Material*> get;
-    static Material_Library& get_library();
+    static MaterialLibrary& get_library();
 
-private:
-    Material_Library();
+   private:
+    MaterialLibrary();
 
     // Singleton
-    static Material_Library library;
-
+    static MaterialLibrary library;
 };
 
-#endif // MATERIAL_LIBRARY_H
+#endif  // MATERIAL_LIBRARY_H
