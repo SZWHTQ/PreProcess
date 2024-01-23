@@ -7,7 +7,7 @@
 #include "BRepPrimAPI_MakeCylinder.hxx"
 #include "Explosive.h"
 #include "JonesWilkinsLee.h"
-#include "Mpmfile.h"
+#include "MpmFile.h"
 #include "MaterialLibrary.h"
 #include "Model.h"
 
