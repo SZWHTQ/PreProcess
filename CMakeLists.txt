@@ -26,8 +26,8 @@ include_directories("include")
 # Create the executable
 add_library(${PROJECT_NAME} ${srcs})
 
-add_executable("main" "src/main.cc")
-target_link_libraries("main" ${PROJECT_NAME})
+add_executable("PreProcessor" "src/main.cc")
+target_link_libraries("PreProcessor" ${PROJECT_NAME})
 
 if(OpenCASCADE_FOUND)
     message(STATUS "OpenCASCADE found: version ${OpenCASCADE_VERSION}")

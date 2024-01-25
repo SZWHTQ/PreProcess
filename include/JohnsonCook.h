@@ -37,6 +37,7 @@ class JohnsonCook : public Material {
           D5(D5_),
           failureStrainFactor(failureStrainFactor_){};
     std::string toString() override;
+    ~JohnsonCook() override{};
 };
 
 #endif

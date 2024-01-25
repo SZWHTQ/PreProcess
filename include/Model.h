@@ -1,6 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -12,7 +13,7 @@ class Model {
    public:
     size_t id;  // component id
     std::string name;
-    TopoDS_Shape shape;
+    std::shared_ptr<TopoDS_Shape> shape;
 
     std::vector<gp_Pnt> particles;
     double dx = 0;
@@ -23,7 +24,7 @@ class Model {
         : id(id_), name(std::move(modelName_)){};
     Model(size_t id_, std::string modelName_, const std::string& filePath_,
           Material* material_);
-    ~Model() { particles.clear(); };
+    ~Model();
 
     std::tuple<gp_Pnt, gp_Pnt> getMaxMinCoordinates() const;
     bool contain(const gp_Pnt& point) const;

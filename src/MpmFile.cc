@@ -156,7 +156,7 @@ void MpmFile::write() {
     // Algorithm
     file << "\n";
     if (GIMP) {
-        file << "gimp\n";
+        file << "gimp on\n";
     }
     switch (algorithm) {
         case ALGORITHM::MUSL:

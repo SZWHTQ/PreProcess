@@ -1,30 +1,23 @@
 // Usage Example
 
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "BRepAlgoAPI_Cut.hxx"
 #include "BRepPrimAPI_MakeCylinder.hxx"
 #include "Explosive.h"
 #include "JonesWilkinsLee.h"
-#include "MpmFile.h"
 #include "MaterialLibrary.h"
 #include "Model.h"
+#include "MpmFile.h"
 
-const TopoDS_Shape createCylinder(double radius, double height,
-                                   gp_Pnt center) {
+const std::shared_ptr<TopoDS_Shape> createCylinder(const double radius,
+                                                   const double height,
+                                                   const gp_Pnt center) {
     gp_Ax2 axis(center, gp_Dir(0, 0, 1));
-    BRepPrimAPI_MakeCylinder cylinder(axis, radius, height);
-    return cylinder.Shape();
-}
-
-const TopoDS_Shape createHollowCylinder(double radius, double height,
-                                          double thickness, gp_Pnt center) {
-    gp_Ax2 axis(center, gp_Dir(0, 0, 1));
-    BRepPrimAPI_MakeCylinder cylinder(axis, radius, height);
-    BRepPrimAPI_MakeCylinder hollow(axis, radius - thickness, height);
-    BRepAlgoAPI_Cut cut(cylinder.Shape(), hollow.Shape());
-    return cut.Shape();
+    return std::make_shared<TopoDS_Shape>(
+        BRepPrimAPI_MakeCylinder(axis, radius, height).Shape());
 }
 
 void generateMDF() {
@@ -38,49 +31,54 @@ void generateMDF() {
 
     // Material
     //  Use Method 1, get from library
-    Model Separator(1, "Separator", "./Model/MDF/101FENLIBAN.STEP",
+    Model Separator(1, "Separator", "./Model/MDF/LargeModel/101FENLIBAN.STEP",
                     library.get["2A14T6"]);
-    Model Cover(2, "Cover", "./Model/MDF/201BAOHUZHAO.STEP",
+    Model Cover(2, "Cover", "./Model/MDF/LargeModel/201BAOHUZHAO.STEP",
                 library.get["2A14T4"]);
-    Model Connector(3, "Connector", "./Model/MDF/301JIEBAN.STEP",
+    Model Connector(3, "Connector", "./Model/MDF/LargeModel/301JIEBAN.STEP",
                     library.get["2A14T6"]);
-    Model Board(4, "Board", "./Model/MDF/401CEBAN_FIX.STEP",
+    Model Board(4, "Board", "./Model/MDF/LargeModel/401CEBAN_UNSYM.STEP",
                 library.get["2A14T6"]);
     //  Use Method 2, direct
-    Model Bolts(5, "Bolts", "./Model/MDF/Bolts.STEP", &MaterialLibrary::steel);
+    Model Bolts(5, "Bolts", "./Model/MDF/LargeModel/Bolts.STEP",
+                &MaterialLibrary::steel);
     //  Or user defined material
     // Model Rdx(6, "RDX", "./Model/MDF/RDX_20.STEP", &RDX);
     // Model PbRing(7, "PbRing", "./Model/MDF/PbRing_20_120.STEP",
     // library.get["Pb"]);
     Model Rdx(6, "RDX");
     Model PbRing(7, "PbRing");
-    const double rdx_radius = 0.3;
-    const double pb_ring_thicknes = 1;
+    const double height = 200;
+    const double rdx_radius = 0.48;
+    const double pb_ring_thicknes = 0.92;
     const gp_Pnt center(1.8, 0, 360);
-    Rdx.shape = createCylinder(rdx_radius, 40, center);
-    PbRing.shape = createHollowCylinder(rdx_radius + pb_ring_thicknes, 40,
-                                          pb_ring_thicknes, center);
+    Rdx.shape = createCylinder(rdx_radius, height, center);
+    PbRing.shape = std::make_shared<TopoDS_Shape>(
+        BRepAlgoAPI_Cut(
+            *createCylinder(rdx_radius + pb_ring_thicknes, height, center),
+            *Rdx.shape)
+            .Shape());
     Rdx.material = &RDX;
     PbRing.material = library.get["Pb"];
 
     // Fill with particles
 #ifdef NDEBUG
     const bool verbose = true;
-    Separator.fill(1, verbose);
-    Cover.fill(1, verbose);
-    Connector.fill(1.5, verbose);
-    Board.fill(1.5, verbose);
-    Bolts.fill(1, verbose);
-    Rdx.fill(0.5, verbose);
-    PbRing.fill(0.5, verbose);
+    Separator.fill(0.4, verbose);
+    Cover.fill(0.4, verbose);
+    Connector.fill(0.5, verbose);
+    Board.fill(0.5, verbose);
+    Bolts.fill(0.5, verbose);
+    Rdx.fill(0.4, verbose);
+    PbRing.fill(0.4, verbose);
 #else
-    Separator.fill_with_particle_sequential(2);
-    Cover.fill_with_particle_sequential(2);
-    Connector.fill_with_particle_sequential(3);
-    Board.fill_with_particle_sequential(3);
-    Bolts.fill_with_particle_sequential(2);
-    Rdx.fill_with_particle_sequential(1);
-    PbRing.fill_with_particle_sequential(1);
+    Separator.fill(2);
+    Cover.fill(2);
+    Connector.fill(3);
+    Board.fill(3);
+    Bolts.fill(2);
+    Rdx.fill(1);
+    PbRing.fill(1);
 #endif
 
     // Another kind of RDX particle distribution
@@ -113,18 +111,18 @@ void generateMDF() {
     //     std::endl;
     // }
 
-    // Duplicate particles along z axis 4 times
-    for (auto&& model : model_list) {
-        auto& P = model->particles;
-        int duplicate_num = 4;
-        size_t original_size = P.size();
-        P.reserve(original_size * 5);
-        for (size_t d = 1; d <= duplicate_num; ++d) {
-            for (size_t i = 0; i < original_size; ++i) {
-                P.emplace_back(P[i].X(), P[i].Y(), P[i].Z() - 40 * d);
-            }
-        }
-    }
+    // // Duplicate particles along z axis 4 times
+    // for (auto&& model : model_list) {
+    //     auto& P = model->particles;
+    //     int duplicate_num = 4;
+    //     size_t original_size = P.size();
+    //     P.reserve(original_size * 5);
+    //     for (size_t d = 1; d <= duplicate_num; ++d) {
+    //         for (size_t i = 0; i < original_size; ++i) {
+    //             P.emplace_back(P[i].X(), P[i].Y(), P[i].Z() - 40 * d);
+    //         }
+    //     }
+    // }
 
     MpmFile MDF("MDF");
     MDF.unit = MpmFile::UNIT::MMGS_ms;
@@ -132,7 +130,7 @@ void generateMDF() {
         MDF.add(*model);
     }
 
-    MDF.dx = 1;
+    MDF.dx = 0.36;
     MDF.dCell_scale = 2;
     MDF.end_time = 0.1;
     MDF.out_time = 5e-4;
@@ -229,10 +227,10 @@ int main() {
     std::cout << "***MDF***" << std::endl;
     generateMDF();
     std::cout << "Done" << std::endl;
+    /*
+        std::cout << "\n\n";
 
-    std::cout << "\n\n";
-
-    std::cout << "***PZG***" << std::endl;
-    generatePZG();
-    std::cout << "Done" << std::endl;
+        std::cout << "***PZG***" << std::endl;
+        generatePZG();
+        std::cout << "Done" << std::endl; */
 }

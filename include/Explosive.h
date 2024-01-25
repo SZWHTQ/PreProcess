@@ -10,6 +10,7 @@ public:
         : Material(density_)
         , detonationSpeed(detonationSpeed_) {};
     std::string toString() override;
+    ~Explosive() override{};
 };
 
 #endif

@@ -18,7 +18,7 @@ class Material {
     EquationOfState* eos = nullptr;
 
     explicit Material(double _density);
-    ~Material();
+    virtual ~Material() = 0;
 
     static size_t getInstanceCount() { return instanceCount; }
     virtual std::string toString() = 0;

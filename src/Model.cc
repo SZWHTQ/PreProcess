@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -66,10 +67,10 @@ Model::Model(size_t id_, std::string modelName_, const std::string& filePath_,
         }
 
         // Transfer the contents of the STEP file to a TopoDS_Shape
-        shape = stepReader.Shape();
+        shape = std::make_shared<TopoDS_Shape>(stepReader.Shape());
     } else if (compareFileExtension(filePath_, "stl")) {
         StlAPI_Reader stlReader;
-        bool status = stlReader.Read(shape, filePath_.c_str());
+        bool status = stlReader.Read(*shape, filePath_.c_str());
 
         if (!status) {
             std::cerr << "Error reading STL file." << std::endl;
@@ -78,11 +79,16 @@ Model::Model(size_t id_, std::string modelName_, const std::string& filePath_,
     }
 }
 
+Model::~Model() {
+    particles.clear();
+    delete material;
+}
+
 std::tuple<gp_Pnt, gp_Pnt> Model::getMaxMinCoordinates() const {
     Bnd_Box bounding_box;
     double xmin, ymin, zmin, xmax, ymax, zmax;
 
-    BRepBndLib::Add(shape, bounding_box);
+    BRepBndLib::Add(*shape, bounding_box);
     bounding_box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
 
     return {gp_Pnt(xmax, ymax, zmax), gp_Pnt(xmin, ymin, zmin)};
@@ -93,7 +99,7 @@ bool Model::contain(const gp_Pnt& point) const {
     // TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(testPoint);
 
     // Use BRepClass3d_SolidClassifier to check if the point is inside the shape
-    BRepClass3d_SolidClassifier classifier(shape);
+    BRepClass3d_SolidClassifier classifier(*shape);
     classifier.Perform(point, 1e-9);
 
     // Check the result of the classification

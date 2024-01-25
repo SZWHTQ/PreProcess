@@ -19,7 +19,6 @@ std::string JohnsonCook::toString() {
     str += std::to_string(D3) + " ";
     str += std::to_string(D4) + " ";
     str += std::to_string(D5) + " ";
-    str += std::to_string(failureStrainFactor);
 
     return str;
 }
