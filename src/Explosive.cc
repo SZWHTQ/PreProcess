@@ -1,9 +1,11 @@
 #include "Explosive.h"
+#include <sstream>
 
 std::string Explosive::toString() {
-    std::string str = std::to_string(localIndex) + " hiex ";
-    str += std::to_string(density) + " ";
-    str += std::to_string(detonationSpeed);
+    std::ostringstream oss;
+    oss << localIndex << " hiex ";
+    oss << density << " ";
+    oss << detonationSpeed;
 
-    return str;
+    return oss.str();
 }

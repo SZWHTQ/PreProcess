@@ -1,4 +1,5 @@
 #include <omp.h>
+#include <sys/ioctl.h>
 
 #include <BRepBndLib.hxx>
 #include <BRepClass3d_SolidClassifier.hxx>
@@ -13,6 +14,7 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -81,7 +83,7 @@ Model::Model(size_t id_, std::string modelName_, const std::string& filePath_,
 
 Model::~Model() {
     particles.clear();
-    delete material;
+    // delete material;
 }
 
 std::tuple<gp_Pnt, gp_Pnt> Model::getMaxMinCoordinates() const {
@@ -140,6 +142,8 @@ void Model::fill(const double _dx, const bool verbose) {
         const double min_x = min_coor.X(), min_y = min_coor.Y(),
                      min_z = min_coor.Z();
         double percent = 0, elapsed = 0, iter_per_second = 0;
+        struct winsize window_size;
+        unsigned int last_output_length = 0;
 
         Timer t;
 
@@ -159,22 +163,29 @@ void Model::fill(const double _dx, const bool verbose) {
                 count++;
                 percent = (double)count / total_num;
                 elapsed = T.elapsed();
+                // ioctl(0, TIOCGWINSZ, &window_size);
+                std::ostringstream info;
                 if (count % interval == 0 || count == total_num) {
                     iter_per_second =
                         interval /
                         (t.elapsed() + std::numeric_limits<double>::min());
                     t.reset();
-                    std::cout
-                        << "\r" << std::setprecision(2)
-                        << "Progress: " << percent * 100 << "%, "
-                        << std::setprecision(1) << "Elapsed: " << elapsed
-                        << "s, "
-                        << "Estimated: "
-                        << elapsed /
-                               (percent + std::numeric_limits<double>::min()) *
-                               (1 - percent)
-                        << "s, " << iter_per_second << "it/s, "
-                        << "Particle number: " << particles.size();
+                    std::ostringstream info;
+                    info << std::fixed << std::setprecision(2);
+                    info << "Progress: " << percent * 100 << "%, ";
+                    info << std::setprecision(1);
+                    info << "Elapsed: " << elapsed << "s, ";
+                    info << "Estimated: "
+                         << elapsed /
+                                (percent + std::numeric_limits<double>::min()) *
+                                (1 - percent)
+                         << "s, ";
+                    info << iter_per_second << "it/s, ";
+                    info << "Particle number: " << particles.size();
+                    auto info_string = info.str();
+                    std::cout << "\r" << std::setw(last_output_length)
+                              << std::left << info_string;
+                    last_output_length = info_string.length();
                     std::cout.flush();
                 }
             }
@@ -195,6 +206,7 @@ void Model::fill(const double _dx, const bool verbose) {
     if (verbose) {
         std::cout.flush();
         std::cout << ANSI_GREEN;
+        std::cout << std::fixed << std::setprecision(2);
         std::cout << "\nTotal elapsed: " << T.elapsed() << "s, "
                   << "Particle number: " << particles.size() << std::endl;
         std::cout << std::setprecision(-1);

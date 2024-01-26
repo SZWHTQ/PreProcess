@@ -1,24 +1,27 @@
+#include <sstream>
+
 #include "JohnsonCook.h"
 
 std::string JohnsonCook::toString() {
-    std::string str = std::to_string(localIndex) + " jcst ";
-    str += std::to_string(density) + " ";
-    str += std::to_string(youngsModulus) + " ";
-    str += std::to_string(poissonsRatio) + " ";
-    str += std::to_string(A) + " ";
-    str += std::to_string(B) + " ";
-    str += std::to_string(n) + " ";
-    str += std::to_string(C) + " ";
-    str += std::to_string(m) + " ";
-    str += std::to_string(roomTemperature) + " ";
-    str += std::to_string(meltingTemperature) + " ";
-    str += std::to_string(specificHeatCapacity) + " ";
-    str += std::to_string(referenceStrainRate) + " ";
-    str += std::to_string(D1) + " ";
-    str += std::to_string(D2) + " ";
-    str += std::to_string(D3) + " ";
-    str += std::to_string(D4) + " ";
-    str += std::to_string(D5) + " ";
+    std::ostringstream oss;
+    oss << localIndex << " jcst ";
+    oss << density << " ";
+    oss << youngsModulus << " ";
+    oss << poissonsRatio << " ";
+    oss << A << " ";
+    oss << B << " ";
+    oss << n << " ";
+    oss << C << " ";
+    oss << m << " ";
+    oss << roomTemperature << " ";
+    oss << meltingTemperature << " ";
+    oss << specificHeatCapacity << " ";
+    oss << referenceStrainRate << " ";
+    oss << D1 << " ";
+    oss << D2 << " ";
+    oss << D3 << " ";
+    oss << D4 << " ";
+    oss << D5;
 
-    return str;
+    return oss.str();
 }

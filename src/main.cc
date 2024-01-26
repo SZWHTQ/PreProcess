@@ -62,23 +62,23 @@ void generateMDF() {
     PbRing.material = library.get["Pb"];
 
     // Fill with particles
-#ifdef NDEBUG
     const bool verbose = true;
-    Separator.fill(0.4, verbose);
-    Cover.fill(0.4, verbose);
-    Connector.fill(0.5, verbose);
-    Board.fill(0.5, verbose);
+#ifdef NDEBUG
+    Separator.fill(0.5, verbose);
+    Cover.fill(0.5, verbose);
+    Connector.fill(0.75, verbose);
+    Board.fill(0.75, verbose);
     Bolts.fill(0.5, verbose);
     Rdx.fill(0.4, verbose);
     PbRing.fill(0.4, verbose);
 #else
-    Separator.fill(2);
-    Cover.fill(2);
-    Connector.fill(3);
-    Board.fill(3);
-    Bolts.fill(2);
-    Rdx.fill(1);
-    PbRing.fill(1);
+    Separator.fill(2, true);
+    Cover.fill(2, true);
+    Connector.fill(3, true);
+    Board.fill(3, true);
+    Bolts.fill(2, true);
+    Rdx.fill(1, true);
+    PbRing.fill(1, true);
 #endif
 
     // Another kind of RDX particle distribution
@@ -130,7 +130,7 @@ void generateMDF() {
         MDF.add(*model);
     }
 
-    MDF.dx = 0.36;
+    MDF.dx = 0.5;
     MDF.dCell_scale = 2;
     MDF.end_time = 0.1;
     MDF.out_time = 5e-4;

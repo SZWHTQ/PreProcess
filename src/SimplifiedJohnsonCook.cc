@@ -1,16 +1,19 @@
+#include <sstream>
+
 #include "SimplifiedJohnsonCook.h"
 
 std::string SimplifiedJohnsonCook::toString() {
-    std::string str = std::to_string(localIndex) + " sjcf ";
-    str += std::to_string(density) + " ";
-    str += std::to_string(youngsModulus) + " ";
-    str += std::to_string(poissonsRatio) + " ";
-    str += std::to_string(A) + " ";
-    str += std::to_string(B) + " ";
-    str += std::to_string(n) + " ";
-    str += std::to_string(C) + " ";
-    str += std::to_string(referenceStrainRate) + " ";
-    str += std::to_string(failureStrain);
+    std::ostringstream oss;
+    oss << localIndex << " sjcf ";
+    oss << density << " ";
+    oss << youngsModulus << " ";
+    oss << poissonsRatio << " ";
+    oss << A << " ";
+    oss << B << " ";
+    oss << n << " ";
+    oss << C << " ";
+    oss << referenceStrainRate << " ";
+    oss << failureStrain;
 
-    return str;
+    return oss.str();
 }
