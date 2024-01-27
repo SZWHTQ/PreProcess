@@ -106,24 +106,6 @@ void generateMDF() {
     auto model_list = {&Separator, &Cover, &Connector, &Board,
                        &Bolts,     &Rdx,   &PbRing};
 
-    // for (auto& model : model_list) {
-    //     std::cout << model->name << ": " << model->particles.size() <<
-    //     std::endl;
-    // }
-
-    // // Duplicate particles along z axis 4 times
-    // for (auto&& model : model_list) {
-    //     auto& P = model->particles;
-    //     int duplicate_num = 4;
-    //     size_t original_size = P.size();
-    //     P.reserve(original_size * 5);
-    //     for (size_t d = 1; d <= duplicate_num; ++d) {
-    //         for (size_t i = 0; i < original_size; ++i) {
-    //             P.emplace_back(P[i].X(), P[i].Y(), P[i].Z() - 40 * d);
-    //         }
-    //     }
-    // }
-
     MpmFile MDF("MDF");
     MDF.unit = MpmFile::UNIT::MMGS_ms;
     for (auto&& model : model_list) {
@@ -139,7 +121,7 @@ void generateMDF() {
 
     MDF.down_extend.x = 20;
     MDF.up_extend.x = 20;
-    MDF.down_extend.z = 40 * 4 + 0.5 * MDF.dx;
+    MDF.down_extend.z = 0.5 * MDF.dx;
     MDF.up_extend.z = 0.5 * MDF.dx;
 
     typedef MpmFile::BOUNDARY bound;
