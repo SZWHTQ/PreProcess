@@ -1,5 +1,4 @@
 #include <omp.h>
-#include <sys/ioctl.h>
 
 #include <BRepBndLib.hxx>
 #include <BRepClass3d_SolidClassifier.hxx>
@@ -88,12 +87,12 @@ Model::~Model() {
 
 std::tuple<gp_Pnt, gp_Pnt> Model::getMaxMinCoordinates() const {
     Bnd_Box bounding_box;
-    double xmin, ymin, zmin, xmax, ymax, zmax;
+    double x_min, y_min, z_min, x_max, y_max, z_max;
 
     BRepBndLib::Add(*shape, bounding_box);
-    bounding_box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
+    bounding_box.Get(x_min, y_min, z_min, x_max, y_max, z_max);
 
-    return {gp_Pnt(xmax, ymax, zmax), gp_Pnt(xmin, ymin, zmin)};
+    return {gp_Pnt(x_max, y_max, z_max), gp_Pnt(x_min, y_min, z_min)};
 }
 
 bool Model::contain(const gp_Pnt& point) const {
@@ -112,9 +111,13 @@ void Model::fill(const double _dx, const bool verbose) {
     Model::dx = _dx;
     auto [max_coor, min_coor] = getMaxMinCoordinates();
 
-    auto x_num = (size_t)((max_coor.X() - min_coor.X()) / dx + 1.5);
-    auto y_num = (size_t)((max_coor.Y() - min_coor.Y()) / dx + 1.5);
-    auto z_num = (size_t)((max_coor.Z() - min_coor.Z()) / dx + 1.5);
+    const double max_x = max_coor.X(), max_y = max_coor.Y(),
+                 max_z = max_coor.Z();
+    const double min_x = min_coor.X(), min_y = min_coor.Y(),
+                 min_z = min_coor.Z();
+    auto x_num = (size_t)((max_x - min_x) / dx + 1.5);
+    auto y_num = (size_t)((max_y - min_y) / dx + 1.5);
+    auto z_num = (size_t)((max_z - min_z) / dx + 1.5);
 
     std::mutex
         particles_mutex;  // Mutex for synchronizing access to particles vector
@@ -124,28 +127,23 @@ void Model::fill(const double _dx, const bool verbose) {
         std::cin.tie(nullptr);
         std::cout.tie(nullptr);
         std::cout << "Filling " << name << "..." << std::endl;
-        std::cout << "Max coordinate: " << max_coor.X() << ", " << max_coor.Y()
-                  << ", " << max_coor.Z() << std::endl;
-        std::cout << "Min coordinate: " << min_coor.X() << ", " << min_coor.Y()
-                  << ", " << min_coor.Z() << std::endl;
-        std::cout << "Total number: " << x_num * y_num * z_num << std::endl;
+        std::cout << "Max coordinate: " << max_x << ", " << max_y << ", "
+                  << max_z << std::endl;
+        std::cout << "Min coordinate: " << min_x << ", " << min_y << ", "
+                  << min_z << std::endl;
+        std::cout << "Total iteration number: " << x_num * y_num * z_num << std::endl;
         std::cout << "Number in each direction: " << x_num << ", " << y_num
                   << ", " << z_num << std::endl;
         std::cout << std::fixed;
     }
 
-    Timer T;
+    Timer timer;
     {
         const size_t total_num = x_num * y_num * z_num;
-        const size_t interval = 5e2;
+        size_t interval = 10;
         size_t count = 0;
-        const double min_x = min_coor.X(), min_y = min_coor.Y(),
-                     min_z = min_coor.Z();
         double percent = 0, elapsed = 0, iter_per_second = 0;
-        struct winsize window_size;
         unsigned int last_output_length = 0;
-
-        Timer t;
 
         particles.reserve(total_num);
 
@@ -162,14 +160,10 @@ void Model::fill(const double _dx, const bool verbose) {
                 std::lock_guard<std::mutex> lock(particles_mutex);
                 count++;
                 percent = (double)count / total_num;
-                elapsed = T.elapsed();
-                // ioctl(0, TIOCGWINSZ, &window_size);
-                std::ostringstream info;
+                elapsed = timer.elapsed();
                 if (count % interval == 0 || count == total_num) {
                     iter_per_second =
-                        interval /
-                        (t.elapsed() + std::numeric_limits<double>::min());
-                    t.reset();
+                        count / (elapsed + std::numeric_limits<double>::min());
                     std::ostringstream info;
                     info << std::fixed << std::setprecision(2);
                     info << "Progress: " << percent * 100 << "%, ";
@@ -186,6 +180,7 @@ void Model::fill(const double _dx, const bool verbose) {
                     std::cout << "\r" << std::setw(last_output_length)
                               << std::left << info_string;
                     last_output_length = info_string.length();
+                    interval = (size_t)iter_per_second / 60;
                     std::cout.flush();
                 }
             }
@@ -207,7 +202,7 @@ void Model::fill(const double _dx, const bool verbose) {
         std::cout.flush();
         std::cout << ANSI_GREEN;
         std::cout << std::fixed << std::setprecision(2);
-        std::cout << "\nTotal elapsed: " << T.elapsed() << "s, "
+        std::cout << "\nTotal elapsed: " << timer.elapsed() << "s, "
                   << "Particle number: " << particles.size() << std::endl;
         std::cout << std::setprecision(-1);
         std::cout << ANSI_RESET_COLOR << std::endl;

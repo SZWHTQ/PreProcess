@@ -49,13 +49,13 @@ void generateMDF() {
     Model Rdx(6, "RDX");
     Model PbRing(7, "PbRing");
     const double height = 200;
-    const double rdx_radius = 0.48;
-    const double pb_ring_thicknes = 0.92;
-    const gp_Pnt center(1.8, 0, 360);
+    const double rdx_radius = 0.3;
+    const double pb_ring_thickness = 0.8;
+    const gp_Pnt center(1.8, 0, 200);
     Rdx.shape = createCylinder(rdx_radius, height, center);
     PbRing.shape = std::make_shared<TopoDS_Shape>(
         BRepAlgoAPI_Cut(
-            *createCylinder(rdx_radius + pb_ring_thicknes, height, center),
+            *createCylinder(rdx_radius + pb_ring_thickness, height, center),
             *Rdx.shape)
             .Shape());
     Rdx.material = &RDX;
@@ -69,8 +69,8 @@ void generateMDF() {
     Connector.fill(0.75, verbose);
     Board.fill(0.75, verbose);
     Bolts.fill(0.5, verbose);
-    Rdx.fill(0.4, verbose);
-    PbRing.fill(0.4, verbose);
+    Rdx.fill(0.3, verbose);
+    PbRing.fill(0.3, verbose);
 #else
     Separator.fill(2, true);
     Cover.fill(2, true);
@@ -131,7 +131,7 @@ void generateMDF() {
     }
 
     MDF.dx = 0.5;
-    MDF.dCell_scale = 2;
+    MDF.dCell_scale = 1.8;
     MDF.end_time = 0.1;
     MDF.out_time = 5e-4;
     MDF.rpt_time = 1.25e-4;
