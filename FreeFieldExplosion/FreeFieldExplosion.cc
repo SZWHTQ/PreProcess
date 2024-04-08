@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 #include <memory>
 
 #include "BRepAlgoAPI_Cut.hxx"
@@ -17,30 +18,40 @@ int main() {
 
     const double thickness = 0.1;
 
-    const double tntDensity = 1630;
-    const double tntDetonationVelocity = 6930;
-    const double tntMass = 5;
-    const double tntRadius = std::sqrt(tntMass / tntDensity / 1 / M_PI);
-    const gp_Pnt center(0, 1.5, 0);
-    const gp_Ax2 axis(center, gp_Dir(0, 0, 1));
-    TNT.shape = std::make_shared<TopoDS_Shape>(
-        BRepPrimAPI_MakeCylinder(axis, tntRadius, thickness).Shape());
-    TNT.material = new Explosive(tntDensity, tntDetonationVelocity);
-    TNT.material->eos = new JonesWilkinsLee(TNT.material->id, 3.712e11, 3.231e9,
-                                            4.15, 0.95, 0.3, 7e9);
+    try {
+        const double tntDensity = 1630;
+        const double tntDetonationVelocity = 6930;
+        const double tntMass = 5;
+        const double tntRadius = std::sqrt(tntMass / tntDensity / 1 / M_PI);
+        std::cout << tntRadius << std::endl;
+        const gp_Pnt center(0, 1.5, 0);
+        const gp_Ax2 axis(center, gp_Dir(0, 0, 1));
+        TNT.shape = std::make_shared<TopoDS_Shape>(
+            BRepPrimAPI_MakeCylinder(axis, tntRadius, thickness).Shape());
+        TNT.material = new Explosive(tntDensity, tntDetonationVelocity);
+        TNT.material->eos = new JonesWilkinsLee(TNT.material->id, 3.712e11,
+                                                3.231e9, 4.15, 0.95, 0.3, 7e9);
+    } catch (const std::exception& e) {
+        std::cerr << "Error in TNT construction: " << e.what() << std::endl;
+    }
 
-    const double airLength = 20;
-    const double airHeight = 7.5;
-    const gp_Pnt leftBottomCorner(-airLength / 2, 0, 0);
-    auto& base =
-        BRepPrimAPI_MakeBox(leftBottomCorner, airLength, airHeight, thickness)
-            .Shape();
-    Air.shape = std::make_shared<TopoDS_Shape>(
-        BRepAlgoAPI_Cut(base, *TNT.shape).Shape());
-    Air.material = library.get["2A14T6"];
+    try {
+        const double airLength = 20;
+        const double airHeight = 7.5;
+        const gp_Pnt leftBottomCorner(-airLength / 2, 0, 0);
+        auto& base = BRepPrimAPI_MakeBox(leftBottomCorner, airLength,
+        airHeight,
+                                         thickness)
+                         .Shape();
+        Air.shape = std::make_shared<TopoDS_Shape>(
+            BRepAlgoAPI_Cut(base, *TNT.shape).Shape());
+        Air.material = library.get["2A14T6"];
+    } catch (const std::exception& e) {
+        std::cerr << "Error in Air construction: " << e.what() << std::endl;
+    }
 
-    Air.fill(0.5);
-    TNT.fill(0.5);
+    TNT.fill(0.01);
+    Air.fill(0.01);
 
     MpmFile ffe("Free Field Explosion");
     auto model_list = {&Air, &TNT};
