@@ -44,5 +44,6 @@ if(OpenMP_CXX_FOUND)
     target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX)
 else()
     message(STATUS "OpenMP not found")
-    
 endif()
+
+add_subdirectory(FreeFieldExplosion)
