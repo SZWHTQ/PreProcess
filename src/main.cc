@@ -72,13 +72,13 @@ void generateMDF() {
     Rdx.fill(0.3, verbose);
     PbRing.fill(0.3, verbose);
 #else
-    Separator.fill(2, true);
-    Cover.fill(2, true);
-    Connector.fill(3, true);
-    Board.fill(3, true);
-    Bolts.fill(2, true);
-    Rdx.fill(1, true);
-    PbRing.fill(1, true);
+    Separator.fill(2, verbose);
+    Cover.fill(2, verbose);
+    Connector.fill(3, verbose);
+    Board.fill(3, verbose);
+    Bolts.fill(2, verbose);
+    Rdx.fill(1, verbose);
+    PbRing.fill(1, verbose);
 #endif
 
     // Another kind of RDX particle distribution
@@ -111,6 +111,21 @@ void generateMDF() {
     for (auto&& model : model_list) {
         MDF.add(*model);
     }
+    MDF.info << "! "
+             << "Separator: " << Separator.dx << ", "
+             << "Cover: " << Cover.dx << ", "
+             << "Connector: " << Connector.dx << ", "
+             << "Board: " << Board.dx << ", "
+             << "Bolts: " << Bolts.dx << ", "
+             << "RDX: " << Rdx.dx << ", "
+             << "PbRing: " << PbRing.dx << std::endl;
+    MDF.info << "! "
+             << "RDX Radius: " << rdx_radius << std::endl;
+    MDF.info << "! "
+             << "Pb Ring Thickness: " << pb_ring_thickness << std::endl;
+    MDF.info << "! "
+             << "RDX line density: "
+             << Rdx.material->density * M_PI * rdx_radius * rdx_radius;
 
     MDF.dx = 0.5;
     MDF.dCell_scale = 1.8;

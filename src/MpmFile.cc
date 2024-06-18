@@ -2,9 +2,9 @@
 #include <iostream>
 #include <unordered_set>
 
-#include "MpmFile.h"
 #include "Material.h"
 #include "Model.h"
+#include "MpmFile.h"
 #include "gp_Pnt.hxx"
 
 size_t MpmFile::getComponentNumber() {
@@ -83,6 +83,7 @@ void MpmFile::write() {
         default:
             break;
     }
+    file << info.str() << "\n";
     file << "nbco " << getComponentNumber() << "\n";
     file << "nbbo " << models.size() << "\n";
     file << "nbmp " << getParticleNumber() << "\n";

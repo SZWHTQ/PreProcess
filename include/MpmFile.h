@@ -3,6 +3,7 @@
 
 #include <list>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -25,6 +26,7 @@ class MpmFile {
     std::list<std::unique_ptr<Model>> models;
 
    public:
+    std::ostringstream info;
     double dx = 0;
     double dCell_scale = 1.8;
     double dt_scale = 0.1;

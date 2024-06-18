@@ -5,6 +5,8 @@ project(
 )
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set OpenCASCADE directory (change this to the actual path on your system)
@@ -32,6 +34,7 @@ target_link_libraries("PreProcessor" ${PROJECT_NAME})
 if(OpenCASCADE_FOUND)
     message(STATUS "OpenCASCADE found: version ${OpenCASCADE_VERSION}")
     include_directories(${OpenCASCADE_INCLUDE_DIR})
+
     # Link with OpenCASCADE libraries
     target_link_libraries(${PROJECT_NAME} ${OpenCASCADE_LIBRARIES})
 else()

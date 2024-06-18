@@ -1,3 +1,5 @@
+#include "Model.h"
+
 #include <omp.h>
 
 #include <BRepBndLib.hxx>
@@ -9,6 +11,7 @@
 #include <TopExp.hxx>
 #include <TopoDS.hxx>
 #include <algorithm>
+#include <cctype>
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -20,7 +23,6 @@
 
 #include "ANSI.h"
 #include "Material.h"
-#include "Model.h"
 #include "ThreadPool.h"
 #include "Timer.h"
 
@@ -131,7 +133,8 @@ void Model::fill(const double _dx, const bool verbose) {
                   << max_z << std::endl;
         std::cout << "Min coordinate: " << min_x << ", " << min_y << ", "
                   << min_z << std::endl;
-        std::cout << "Total iteration number: " << x_num * y_num * z_num << std::endl;
+        std::cout << "Total iteration number: " << x_num * y_num * z_num
+                  << std::endl;
         std::cout << "Number in each direction: " << x_num << ", " << y_num
                   << ", " << z_num << std::endl;
         std::cout << std::fixed;
@@ -354,8 +357,7 @@ void Model::fillSequentially(const double _dx, const bool verbose) {
                         << "\r" << std::setprecision(2)
                         << "Progress: " << percent * 100 << "%, "
                         << std::setprecision(1) << "Elapsed: " << elapsed
-                        << "s, "
-                        << "Estimated: "
+                        << "s, " << "Estimated: "
                         << elapsed /
                                (percent + std::numeric_limits<double>::min()) *
                                (1 - percent)
