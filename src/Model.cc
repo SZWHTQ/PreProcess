@@ -1,5 +1,3 @@
-#include "Model.h"
-
 #include <omp.h>
 
 #include <BRepBndLib.hxx>
@@ -23,6 +21,7 @@
 
 #include "ANSI.h"
 #include "Material.h"
+#include "Model.h"
 #include "ThreadPool.h"
 #include "Timer.h"
 
@@ -121,9 +120,6 @@ void Model::fill(const double _dx, const bool verbose) {
     auto y_num = (size_t)((max_y - min_y) / dx + 1.5);
     auto z_num = (size_t)((max_z - min_z) / dx + 1.5);
 
-    std::mutex
-        particles_mutex;  // Mutex for synchronizing access to particles vector
-
     if (verbose) {
         std::ios_base::sync_with_stdio(false);
         std::cin.tie(nullptr);
@@ -141,6 +137,8 @@ void Model::fill(const double _dx, const bool verbose) {
     }
 
     Timer timer;
+    std::mutex
+        particles_mutex;  // Mutex for synchronizing access to particles vector
     {
         const size_t total_num = x_num * y_num * z_num;
         size_t interval = 10;
